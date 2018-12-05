@@ -2,22 +2,31 @@
   (:require [clojure.test :refer :all]
             [ticktok.core :refer :all]
             [compojure.core :refer :all]
+            [compojure.handler :as handler]
             [compojure.route :refer :all]
-            [cheshire.core :as json]
-            [org.httpkit.server :as server]))
+            [ring.middleware.json :as middleware]
+            [org.httpkit.server :as http]
+            [clojure.data.json :as json]
+            [clojure.core.async :as async :refer [chan dropping-buffer put! <! <!! go]]))
 
 (defonce server (atom {:instance nil
-                       :requests #{}}))
+                       :request (chan 1)}))
+
 
 (defn clock-handler [req]
-  (do
-    (swap! server update-in conj req)
-    {:status 404
-     :headers {"Content-Type" "application/json"}}))
+  (let [clock (:body req)]
+    (println "stub ticktok got " clock)
+    (swap! server update-in [:request] put! clock)
+    {:status 404}))
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
-           (POST / [] clock-handler)))
+           (POST "/" [] clock-handler)))
+
+(def app
+  (-> (handler/site api-routes)
+      (middleware/wrap-json-body {:keywords? true})))
+
 
 (defn stop-server [server]
   (let [inst (get @server :instance)]
@@ -27,18 +36,21 @@
     nil)))
 
 (defn start-server []
-  (swap! server assoc :instance (server/run-server #'api-routes {:port 8080}))
+  (swap! server assoc :instance (http/run-server #'app {:port 8080}))
+  (println "statring stub server")
   server)
 
-(defn incoming-requests [server]
-  (get @server :requests))
+(defn incoming-request [server]
+  (let [c (get @server :instance)]
+    (println "----------------- HERE ------------")
+    (<!! c)))
 
-(deftest fail-if-ticktok-server-not-found
+(deftest componenet
   (testing "Should fail if ticktok server not found"
     (let [server (start-server)
           clock {:name "myclock"
                  :schedule "Every.5.Seconds"}
           result (ticktok clock)]
       (is (nil? result))
-      (is (contains? (incoming-requests server) clock))
+      (is (incoming-request server) clock)
       (stop-server server))))
