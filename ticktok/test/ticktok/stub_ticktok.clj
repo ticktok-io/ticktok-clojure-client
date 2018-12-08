@@ -33,14 +33,12 @@
   (let [inst (get @server :instance)]
     (when-not (nil? inst)
       (inst :timeout 100)
-      (swap! server assoc :instance nil)
-      (swap! server assoc :request nil)
+      (swap! server assoc :instance nil :request nil)
       nil)))
 
 (defn start-server []
-  (swap! server assoc :instance (http/run-server #'app {:port 8080}))
-  (swap! server assoc :request (chan 1))
-  (println "statring stub server")
+  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
+  (println "stub ticktok started")
   server)
 
 (defn incoming-request []
