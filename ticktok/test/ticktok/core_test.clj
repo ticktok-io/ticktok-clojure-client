@@ -17,4 +17,4 @@
                  :schedule "Every.5.Seconds"}
           result (ticktok host clock)]
       (is (false? result))
-      (is (stub/incoming-request) clock))))
+      (is (:body (stub/incoming-request)) clock))))

@@ -13,12 +13,11 @@
 
 
 (defn clock-handler [req]
-  (let [clock (:body req)]
-    (println "stub ticktok got " clock)
-    (swap! server update-in [:request] #(do
-                                          (put! % clock)
-                                          %))
-    {:status 404}))
+  (println "stub ticktok got " req)
+  (swap! server update-in [:request] #(do
+                                        (put! % req)
+                                        %))
+  {:status 404})
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
