@@ -29,7 +29,7 @@
       (middleware/wrap-json-body {:keywords? true})))
 
 
-(defn stop-server [server]
+(defn stop-server []
   (let [inst (get @server :instance)]
     (when-not (nil? inst)
       (inst :timeout 100)
@@ -43,7 +43,7 @@
   (println "statring stub server")
   server)
 
-(defn incoming-request [server]
+(defn incoming-request []
   (let [c (get @server :request)
         req (<!! c)]
     req))
