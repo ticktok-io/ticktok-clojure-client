@@ -11,6 +11,22 @@
 (defonce server (atom {:instance nil
                        :request nil}))
 
+
+(defn clock-handler [req]
+  (println "stub ticktok got " req)
+  (swap! server update-in [:request] #(do
+                                        (put! % req)
+                                        %))
+  {:status 404})
+
+(defroutes api-routes
+  (context "/api/v1/clocks" []
+           (POST "/" [] clock-handler)))
+
+(def app
+  (-> (handler/site api-routes)
+      (middleware/wrap-json-body {:keywords? true})))
+
 (defn stop []
   (let [inst (get @server :instance)]
     (when-not (nil? inst)
@@ -27,18 +43,3 @@
   (let [c (get @server :request)
         req (<!! c)]
     req))
-
-(defn clock-handler [req]
-  (println "stub ticktok got " req)
-  (swap! server update-in [:request] #(do
-                                        (put! % req)
-                                        %))
-  {:status 404})
-
-(defroutes api-routes
-  (context "/api/v1/clocks" []
-           (POST "/" [] clock-handler)))
-
-(def app
-  (-> (handler/site api-routes)
-      (middleware/wrap-json-body {:keywords? true})))
