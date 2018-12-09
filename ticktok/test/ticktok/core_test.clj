@@ -4,9 +4,9 @@
             [ticktok.stub-ticktok :as stub]))
 
 (defn with-ticktok-server [f]
-  (stub/start-server)
+  (stub/start)
   (f)
-  (stub/stop-server))
+  (stub/stop))
 
 (use-fixtures :once with-ticktok-server)
 

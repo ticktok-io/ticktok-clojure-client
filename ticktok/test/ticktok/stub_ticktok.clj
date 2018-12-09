@@ -11,6 +11,22 @@
 (defonce server (atom {:instance nil
                        :request nil}))
 
+(defn stop []
+  (let [inst (get @server :instance)]
+    (when-not (nil? inst)
+      (inst :timeout 100)
+      (swap! server assoc :instance nil :request nil)
+      nil)))
+
+(defn start []
+  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
+  (println "stub ticktok started")
+  server)
+
+(defn incoming-request []
+  (let [c (get @server :request)
+        req (<!! c)]
+    req))
 
 (defn clock-handler [req]
   (println "stub ticktok got " req)
@@ -26,21 +42,3 @@
 (def app
   (-> (handler/site api-routes)
       (middleware/wrap-json-body {:keywords? true})))
-
-
-(defn stop-server []
-  (let [inst (get @server :instance)]
-    (when-not (nil? inst)
-      (inst :timeout 100)
-      (swap! server assoc :instance nil :request nil)
-      nil)))
-
-(defn start-server []
-  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
-  (println "stub ticktok started")
-  server)
-
-(defn incoming-request []
-  (let [c (get @server :request)
-        req (<!! c)]
-    req))

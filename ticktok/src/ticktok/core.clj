@@ -13,8 +13,3 @@
        {:keys [status body error]} @(http/post endpoint
                        options)]
     (= status 201)))
-
-(defn -main
-  "I don't do a whole lot ... yet."
-  [& args]
-  (println "Hello, World!"))
