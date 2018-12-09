@@ -12,7 +12,7 @@
 
 (use-fixtures :once with-ticktok-server)
 
-(deftest componenet
+(deftest component
   (testing "Should fail if ticktok server not found"
     (let [clock {:name "myclock"
                  :schedule "Every.5.Seconds"}
