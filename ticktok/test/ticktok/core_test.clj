@@ -3,6 +3,8 @@
             [ticktok.core :refer :all]
             [ticktok.stub-ticktok :as stub]))
 
+(def host  "http://localhost:8080")
+
 (defn with-ticktok-server [f]
   (stub/start)
   (f)
@@ -12,8 +14,7 @@
 
 (deftest componenet
   (testing "Should fail if ticktok server not found"
-    (let [host "http://localhost:8080"
-          clock {:name "myclock"
+    (let [clock {:name "myclock"
                  :schedule "Every.5.Seconds"}
           result (ticktok host clock)]
       (is (false? result))
