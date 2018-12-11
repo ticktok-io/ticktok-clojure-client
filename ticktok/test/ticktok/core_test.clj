@@ -5,17 +5,13 @@
 
 (def host  "http://localhost:8080")
 
-(defn with-ticktok-server [f]
-  (stub/start)
-  (f)
-  (stub/stop))
-
-(use-fixtures :once with-ticktok-server)
-
 (deftest component
   (testing "Should fail if ticktok server not found"
-    (let [clock {:name "myclock"
+    (let [stub-ticktok (stub/start)
+          clock {:name "myclock"
                  :schedule "Every.5.Seconds"}
           result (ticktok host clock)]
+      (stub/respond-with stub-ticktok {:status 404})
       (is (false? result))
-      (is (:body (stub/incoming-request)) clock))))
+      (is (:body (stub/incoming-request stub-ticktok)) clock)
+      (stub/stop stub-ticktok))))

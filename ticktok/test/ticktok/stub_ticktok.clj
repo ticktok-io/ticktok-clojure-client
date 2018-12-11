@@ -11,7 +11,6 @@
 (defonce server (atom {:instance nil
                        :request nil}))
 
-
 (defn clock-handler [req]
   (println "stub ticktok got " req)
   (swap! server update-in [:request] #(do
@@ -27,7 +26,7 @@
   (-> (handler/site api-routes)
       (middleware/wrap-json-body {:keywords? true})))
 
-(defn stop []
+(defn stop [server]
   (let [inst (get @server :instance)]
     (when-not (nil? inst)
       (inst :timeout 100)
@@ -39,7 +38,7 @@
   (println "stub ticktok started")
   server)
 
-(defn incoming-request []
+(defn incoming-request [server]
   (let [c (get @server :request)
         req (<!! c)]
     req))

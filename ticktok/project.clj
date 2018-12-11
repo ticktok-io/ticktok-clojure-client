@@ -11,7 +11,8 @@
                  [ring "1.7.1"]
                  [org.clojure/data.json "0.2.6"]
                  [ring/ring-json "0.4.0"]
-                 [org.clojure/core.async "0.4.490"]]
+                 [org.clojure/core.async "0.4.490"]
+                 [com.novemberain/langohr "5.0.0"]]
   :jvm-opts ["--add-modules" "java.xml.bind"]
   :main ^:skip-aot ticktok.core
   :target-path "target/%s"

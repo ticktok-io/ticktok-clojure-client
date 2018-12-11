@@ -1,5 +1,4 @@
 (ns ticktok.core
-  (:gen-class)
   (require [org.httpkit.client :as http]
            [clojure.data.json :as json]
            [clojure.string :as string]))
