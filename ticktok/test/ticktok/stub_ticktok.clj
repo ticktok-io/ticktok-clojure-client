@@ -9,14 +9,19 @@
 
 
 (defonce server (atom {:instance nil
-                       :request nil}))
+                       :request nil
+                       :response nil}))
+
+(defn respond-with [server res]
+  (swap! server assoc :response res)
+  nil)
 
 (defn clock-handler [req]
   (println "stub ticktok got " req)
   (swap! server update-in [:request] #(do
                                         (put! % req)
                                         %))
-  {:status 404})
+  (get @server :response))
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
@@ -30,7 +35,7 @@
   (let [inst (get @server :instance)]
     (when-not (nil? inst)
       (inst :timeout 100)
-      (swap! server assoc :instance nil :request nil)
+      (swap! server assoc :instance nil :request nil :response nil)
       nil)))
 
 (defn start []
