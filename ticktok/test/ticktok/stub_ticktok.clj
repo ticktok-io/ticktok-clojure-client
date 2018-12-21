@@ -38,6 +38,7 @@
     (when-not (nil? inst)
       (inst :timeout 100)
       (swap! server assoc :instance nil :request nil :response nil)
+      (println "stub ticktok stopped")
       nil)))
 
 (defn start []
