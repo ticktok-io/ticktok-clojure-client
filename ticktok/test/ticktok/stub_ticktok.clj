@@ -17,11 +17,13 @@
   nil)
 
 (defn clock-handler [req]
-  (println "stub ticktok got " req)
-  (swap! server update-in [:request] #(do
-                                        (put! % req)
-                                        %))
-  (get @server :response))
+  (let [res (get @server :response)]
+    (println "stub ticktok got " req)
+    (swap! server update-in [:request] #(do
+                                          (put! % req)
+                                          %))
+    (println "stub ticktok respond with " res)
+    res))
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
