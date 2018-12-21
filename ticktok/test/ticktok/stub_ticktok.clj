@@ -5,7 +5,7 @@
             [compojure.route :refer :all]
             [ring.middleware.json :as middleware]
             [org.httpkit.server :as http]
-            [clojure.core.async :as async :refer [chan dropping-buffer put! <! <!! go]]))
+            [clojure.core.async :as async :refer [chan put! <!!]]))
 
 
 (defonce server (atom {:instance nil
