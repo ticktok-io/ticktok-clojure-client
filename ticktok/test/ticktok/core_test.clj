@@ -9,9 +9,8 @@
   (testing "Should fail if ticktok server not found"
     (let [stub-ticktok (stub/start)
           clock {:name "myclock"
-                 :schedule "Every.5.Seconds"}
-          result (ticktok host clock)]
+                 :schedule "Every.5.Seconds"}]
       (stub/respond-with stub-ticktok {:status 404})
-      (is (false? result))
+      (is (false? (ticktok host clock)))
       (is (:body (stub/incoming-request stub-ticktok)) clock)
       (stub/stop stub-ticktok))))
