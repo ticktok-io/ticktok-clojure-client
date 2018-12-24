@@ -13,7 +13,11 @@
                  [ring/ring-json "0.4.0"]
                  [org.clojure/core.async "0.4.490"]
                  [com.novemberain/langohr "5.0.0"]]
-  :jvm-opts ["--add-modules" "java.xml.bind"]
+  :jvm-opts ~(let [version     (System/getProperty "java.version")
+                   [major _ _] (clojure.string/split version #"\.")]
+               (if (>= (java.lang.Integer/parseInt major) 9)
+                 ["--add-modules" "java.xml.bind"]
+                 []))
   :main ^:skip-aot ticktok.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}})
