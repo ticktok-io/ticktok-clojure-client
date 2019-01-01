@@ -1,7 +1,7 @@
 version: 2 # use CircleCI 2.0
 jobs: # basic units of work in a run
   build: # runs not using Workflows must have a `build` job as entry point
-    working_directory: ~/ticktok # directory where steps will run
+    working_directory: ~/temp # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/clojure:lein-2.8.1 # ...with this image as the primary container; this is where all `steps` will run
     environment: # environment variables for primary container
