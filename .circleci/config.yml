@@ -1,6 +1,7 @@
 version: 2 # use CircleCI 2.0
 jobs: # basic units of work in a run
   build: # runs not using Workflows must have a `build` job as entry point
+    working_directory: ~/temp # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/clojure:lein-2.8.1 # ...with this image as the primary container; this is where all `steps` will run
     environment: # environment variables for primary container
@@ -8,7 +9,8 @@ jobs: # basic units of work in a run
       JVM_OPTS: -Xmx3200m # limit the maximum heap size to prevent out of memory errors
     steps: # commands that comprise the `build` job
       - checkout # check out source code to working directory
-      - run: ls 
+      - run: ls ~/ticktok
+      - run: cd ticktok
       - restore_cache: # restores saved cache if checksum hasn't changed since the last run
           key: ticktok-{{ checksum "project.clj" }}
       - run: lein deps
