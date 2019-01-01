@@ -11,4 +11,4 @@
         endpoint (string/join [host api])
        {:keys [status body error]} @(http/post endpoint
                        options)]
-    (= status 201)))
+true))
