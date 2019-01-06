@@ -21,27 +21,14 @@
   :main ^:skip-aot ticktok.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
-  :deploy-repositories   :deploy-repositories [["releases"
-                                                {:url
-                                                 "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
-                                                 :sign-releases false
-                                                 :username :env/bintray_username
-                                                 :password :env/bintray_api_key}]
-                                               ["snapshots"
-                                                {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
-                                                 :sign-releases false
-                                                 :username :env/bintray_username
-                                                 :password :env/bintray_api_key}]]
-
-
-  [["releases"
+  :deploy-repositories [["releases"
                          {:url
-                         "https://dl.bintray.com/ticktok-io/maven/ticktok-clojure-client/;publish=1"
+                          "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
                           :sign-releases false
                           :username :env/bintray_username
                           :password :env/bintray_api_key}]
                         ["snapshots"
-                         {:url "https://dl.bintray.com/ticktok-io/maven/ticktok-clojure-client/;publish=1"
+                         {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
                           :sign-releases false
                           :username :env/bintray_username
                           :password :env/bintray_api_key}]])
