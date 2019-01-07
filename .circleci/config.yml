@@ -23,4 +23,4 @@ jobs: # basic units of work in a run
       # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
       - run:
          name: Deploy
-         command: lein release-tasks
+         command: .circleci/deploy.sh
