@@ -16,11 +16,9 @@ jobs: # basic units of work in a run
           paths:
             - ~/.m2
           key: ticktok-{{ checksum "project.clj" }}
-      - run: lein do test, uberjar
-      - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/ 
-          path: target/uberjar/ticktok.jar
-          destination: uberjar
-      # See https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
+      - run:
+         name: Testing
+         command: lein test
       - run:
          name: Deploy
          command: .circleci/deploy.sh
