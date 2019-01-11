@@ -34,12 +34,15 @@
 
   :deploy-repositories [["releases"
                          {:url
-                          "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
+                          "https://dl.bintray.com/ticktok-io/maven/ticktok-clojure-client/"
+                          (comment "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/")
                           :sign-releases false
                           :username :env/bintray_username
                           :password :env/bintray_api_key}]
                         ["snapshots"
-                         {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
+                         {:url
+                          "https://dl.bintray.com/ticktok-io/maven/ticktok-clojure-client/"
+                          (comment "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/")
                           :sign-releases false
                           :username :env/bintray_username
                           :password :env/bintray_api_key}]])
