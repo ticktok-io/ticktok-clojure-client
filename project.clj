@@ -21,6 +21,17 @@
                                   [org.clojure/core.async "0.4.490"]
                                   [ring/ring-json "0.4.0"]
                                   [com.novemberain/langohr "5.0.0"]]}}
+
+  :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version"
+                   "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
+
   :deploy-repositories [["releases"
                          {:url
                           "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
