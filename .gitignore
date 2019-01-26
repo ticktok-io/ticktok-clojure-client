@@ -2,3 +2,4 @@
 .DS_Store
 pom.xml
 .lein-failures
+.settings.xml
