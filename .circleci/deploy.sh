@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 set -e
-printenv
 
 echo "Configing git credentials"
 git config --global user.email "${GIT_EMAIL}"
