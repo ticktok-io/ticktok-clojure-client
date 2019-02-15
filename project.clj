@@ -20,4 +20,24 @@
                                   [ring "1.7.1"]
                                   [org.clojure/core.async "0.4.490"]
                                   [ring/ring-json "0.4.0"]
-                                  [com.novemberain/langohr "5.0.0"]]}})
+                                  [com.novemberain/langohr "5.0.0"]]}}
+   :release-tasks [["vcs" "assert-committed"]
+                  ["change" "version"
+                   "leiningen.release/bump-version" "release"]
+                  ["vcs" "commit"]
+                  ["vcs" "tag" "--no-sign"]
+                  ["deploy"]
+                  ["change" "version" "leiningen.release/bump-version"]
+                  ["vcs" "commit"]
+                  ["vcs" "push"]]
+
+  :repositories [["releases"
+                         {:url "https://clojars.org/repo"
+                          :sign-releases false
+                          :username :env/clojars_username
+                          :password :env/clojars_password}]
+                 ["snapshots"
+                         {:url "https://clojars.org/repo"
+                          :sign-releases false
+                          :username :env/clojars_username
+                          :password :env/clojars_password}]])
