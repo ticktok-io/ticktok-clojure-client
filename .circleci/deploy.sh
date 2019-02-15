@@ -9,7 +9,7 @@ echo "Config git credentials"
 git config --global user.email "${GIT_EMAIL}"
 git config --global user.name "${GIT_USERNAME}"
 
-if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == realease-* ]; then
+if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == release-* ]; then
     echo going to deploy
     lein deploy
     echo deployed successfully
