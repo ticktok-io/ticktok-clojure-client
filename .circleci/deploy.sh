@@ -4,8 +4,8 @@ set -e
 echo "Git branch: ${CIRCLE_BRANCH}"
 echo "Creating lein profiles.clj"
 echo "{:user {}
- :auth {:repository-auth {#"clojars" {:username #=(eval (System/getenv "CLOJARS_USERNAME"))
-                                      :password  #=(eval (System/getenv "CLOJARS_PASSWORD"))}}}}" > ~/.lein/profiles.clj
+ :auth {:repository-auth {#\"clojars\" {:username #=(eval (System/getenv \"CLOJARS_USERNAME\"))
+                                      :password  #=(eval (System/getenv \"CLOJARS_PASSWORD\"))}}}}" > ~/.lein/profiles.clj
 echo "Verifying file created.."
 cat ~/.lein/profiles.clj
 
