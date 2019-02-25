@@ -32,13 +32,7 @@
                   ["vcs" "commit"]
                   ["vcs" "push"]]
 
-  :repositories [["releases"
-                         {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
-                          :sign-releases false
-                          :username :env/bintray_username
-                          :password :env/bintray_api_key}]
-                        ["snapshots"
-                         {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
-                          :sign-releases false
-                          :username :env/bintray_username
-                          :password :env/bintray_api_key}]])
+  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
+                                    :sign-releases false
+                                    :username :env/clojars_username
+                                    :password :env/clojars_password}]])
