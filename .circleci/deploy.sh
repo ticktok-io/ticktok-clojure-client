@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "${CIRCLE_BRANCH}" == "master" ] || [ "${CIRCLE_BRANCH}" == realease-* ]; then
+if [ "${CIRCLE_BRANCH}" == "release" ]; then
     echo going to deploy
     lein release
     echo deployed successfully
