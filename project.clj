@@ -15,12 +15,13 @@
   :main ^:skip-aot ticktok.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
-             :dev {:dependencies [[org.clojure/clojure "1.8.0"]
-                                  [compojure "1.6.1"]
+             :dev {:dependencies [[compojure "1.6.1"]
                                   [ring "1.7.1"]
                                   [org.clojure/core.async "0.4.490"]
                                   [ring/ring-json "0.4.0"]
-                                  [com.novemberain/langohr "5.0.0"]]}}
+                                  [com.novemberain/langohr "5.0.0"]
+                                  [midje "1.9.6"]]
+                   :plugins [[lein-midje "3.2.1"]]}}
 
   :release-tasks [["vcs" "assert-committed"]
                   ["change" "version"
@@ -32,13 +33,7 @@
                   ["vcs" "commit"]
                   ["vcs" "push"]]
 
-  :repositories [["releases"
-                         {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
-                          :sign-releases false
-                          :username :env/bintray_username
-                          :password :env/bintray_api_key}]
-                        ["snapshots"
-                         {:url "https://api.bintray.com/content/ticktok-io/maven/ticktok-clojure-client/"
-                          :sign-releases false
-                          :username :env/bintray_username
-                          :password :env/bintray_api_key}]])
+  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
+                                    :sign-releases false
+                                    :username :env/clojars_username
+                                    :password :env/clojars_password}]])
