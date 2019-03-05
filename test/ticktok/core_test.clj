@@ -25,7 +25,7 @@
        (with-state-changes [(before :facts (start-ticktok))
                             (after :facts (stop-ticktok))]
          (fact "should fail if ticktok server not found"
-               (prerequisite (stub-ticktok-is-not-found)) => nil)
+               (prerequisite (stub-ticktok-is-not-found) => nil)
                (let [clock {:name "myclock"
                             :schedule "Every.5.Seconds"}]
                  (ticktok host clock) => false
