@@ -14,13 +14,13 @@
 
 (defn respond-with [server res]
   (swap! server assoc :response res)
+  (println "------ respond with -------")
   nil)
 
 (defn clock-handler [req]
   (let [res (get @server :response)]
-    (println "stub ticktok got " req)
     (put! (get @server :request) req)
-    (println "stub ticktok respond with " res)
+    (println "stub ticktok got" (:body req) "and respond with" res)
     res))
 
 (defroutes api-routes

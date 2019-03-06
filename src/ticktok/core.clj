@@ -10,5 +10,10 @@
                  :body (json/write-str clock)}
         endpoint (string/join [host api])
        {:keys [status body error]} @(http/post endpoint
-                       options)]
-    (= status 201)))
+                                               options)]
+    (println "status " status)
+    (println "error " error)
+    (println "body " body)
+    (when status
+      (= 201 status)
+      nil)))
