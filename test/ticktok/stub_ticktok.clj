@@ -14,7 +14,6 @@
 
 (defn respond-with [server res]
   (swap! server assoc :response res)
-  (println "------ respond with -------")
   nil)
 
 (defn clock-handler [req]

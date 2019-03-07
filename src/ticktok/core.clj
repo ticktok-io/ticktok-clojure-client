@@ -14,6 +14,5 @@
     (println "status " status)
     (println "error " error)
     (println "body " body)
-    (when status
-      (= 201 status)
-      nil)))
+    (println (and (some? status) (= status 404)))
+    (if (and (some? status) (= status 404)) false nil)))
