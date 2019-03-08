@@ -49,3 +49,10 @@
            (against-background [(before :facts (stub/respond-with (stub-ticktok) clock))]
                                (fact "should return clock details"
                                      (ticktok host clock-request) => (:body clock))))))
+(facts :unit "about clock validity"
+       (tabular
+        (fact "should return false for invalid clock request"
+              (ticktok ?host ?clock => false))
+        ?host ?clock
+        "" {}
+        ))
