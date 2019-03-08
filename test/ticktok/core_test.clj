@@ -37,14 +37,15 @@
 
 
 (facts :e2e "about ticktok"
-       (with-state-changes [(before :facts (start-ticktok))
-                            (after :facts (stop-ticktok))]
-         (let [clock-request (make-clock-request)]
-           (against-background [(before :facts (stub-ticktok-is-not-found))]
-                               (fact "should fail if ticktok server not found"
+       (with-state-changes [(before :contents (start-ticktok))
+                            (after :contents (stop-ticktok))]
+         (against-background [(before :facts (stub-ticktok-is-not-found))]
+                             (fact "should fail if ticktok server not found"
+                                   (let [clock-request (make-clock-request)]
                                      (ticktok host clock-request) => false
                                      (:body (stub/incoming-request (stub-ticktok))) => clock-request)))
-         (comment (fact "should return clock details"
-                          (let [clock (make-clock-from clock-request)]
-                            (prerequisites (stub/respond-with (stub-ticktok) clock) => nil)
-                            (ticktok host clock-request) => (:body clock))))))
+         (let [clock-request (make-clock-request)
+               clock (make-clock-from clock-request)]
+           (against-background [(before :facts (stub/respond-with (stub-ticktok) clock))]
+                               (fact "should return clock details"
+                                     (ticktok host clock-request) => (:body clock))))))
