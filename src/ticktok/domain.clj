@@ -19,21 +19,27 @@
 
 (s/def ::channel (s/keys :req [::queue ::uri]))
 
-(s/def ::clock-request (s/keys :req [::name ::schedule]))
+(s/def ::clock-request (s/keys :req-un [::name ::schedule]))
 
 (s/def ::url string?)
 
-(s/def ::clock (s/keys :req [::channel ::id ::name ::schedule ::url]))
+(s/def ::clock (s/keys :req-un [::channel ::id ::name ::schedule ::url]))
 
 (s/def ::host string?)
 
 (s/def ::token string?)
 
-(s/def ::config (s/keys :req [::host ::token]))
+(s/def ::config (s/keys :req-un [::host ::token]))
 
-(s/valid? ::clock-request {})
+(defn is-valid? [type input]
+  (let [parsed (s/conform type input)]
+    (not= parsed ::s/invalid)))
 
-(s/explain ::clock-request {})
+(defn conform-config [config]
+  (s/conform ::config config))
+
+(defn conform-clock-request [clock-req]
+  (s/conform ::clock-request clock-req))
 
 (defn valid-config? [config]
   (is-valid? ::config config))
@@ -41,9 +47,6 @@
 (defn valid-clock-request? [clock-req]
   (is-valid? ::clock-request clock-req))
 
-(defn is-valid? [type input]
-  (let [parsed (s/conform type input)]
-    (not= parsed ::s/invalid)))
-
 (defn invalid-input [type input]
+  (println "----------- kdkdkd " type " ------ "  input)
   (throw (ex-info "Invalid input" (s/explain-data type input))))

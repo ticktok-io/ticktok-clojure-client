@@ -1,8 +1,9 @@
 (ns ticktok.core
   (:require [org.httpkit.client :as http]
-           [clojure.data.json :as json]
-           [clojure.string :as string]
-           [ticktok.domain :as dom]))
+            [clojure.data.json :as json]
+            [clojure.string :as string]
+            [ticktok.domain :as dom]
+            [clojure.spec.alpha :as s]))
 
 (def api "/api/v1/clocks")
 
@@ -19,10 +20,18 @@
       body
       false)))
 
-
 (defn ticktok [config clock-request]
-  (cond
-    (not (dom/valid-config? config)) (dom/invalid-input :dom/config config)
-    (not (dom/valid-clock-request? clock-request)) (dom/invalid-input :dom/clock-request clock-request)
-    :else
-    (get-clock (:host config) clock-request)))
+  (let [parsed-config (dom/conform-config config)
+        parsed-clock-request (dom/conform-clock-request clock-request)]
+    (println "config " parsed-config)
+    (println "clock " parsed-clock-request)
+    (cond
+      (= ::s/invalid parsed-config) (dom/invalid-input ::dom/config config)
+      (= ::s/invalid parsed-clock-request) (dom/invalid-input ::dom/clock-request clock-request)
+      :else
+      (get-clock (:host parsed-config) parsed-clock-request))))
+
+(def cl {:name "myclock"
+         :schedule "every.5.seconds"})
+
+(s/explain ::dom/clock-request cl)

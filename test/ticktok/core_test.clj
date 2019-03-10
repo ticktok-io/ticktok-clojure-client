@@ -1,7 +1,6 @@
 (ns ticktok.core-test
   (:require [clojure.test :refer :all]
             [ticktok.core :refer :all]
-            [ticktok.domain :refer :all]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [clojure.data.json :as json])
@@ -10,6 +9,9 @@
 (def host  "http://localhost:8080")
 
 (def state (atom {:stub-ticktok nil}))
+
+(def config {:host host :token "my.token"})
+
 
 (defn start-ticktok []
   (swap! state assoc :stub-ticktok (stub/start)))
@@ -25,7 +27,7 @@
 
 (defn make-clock-request []
   {:name "myclock"
-   :schedule "Every.5.Seconds"})
+   :schedule "every.5.seconds"})
 
 (defn make-clock-from [clock-req]
   (let [body {::channel {::queue "queue.it"
@@ -42,17 +44,17 @@
          (against-background [(before :facts (stub-ticktok-is-not-found))]
                              (fact "should fail if ticktok server not found"
                                    (let [clock-request (make-clock-request)]
-                                     (ticktok host clock-request) => false
+                                     (ticktok config clock-request) => false
                                      (:body (stub/incoming-request (stub-ticktok))) => clock-request)))
          (let [clock-request (make-clock-request)
                clock (make-clock-from clock-request)]
            (against-background [(before :facts (stub/respond-with (stub-ticktok) clock))]
                                (fact "should return clock details"
-                                     (ticktok host clock-request) => (:body clock))))))
+                                     (ticktok config clock-request) => (:body clock))))))
 (facts :unit "about clock validity"
        (tabular
-        (fact "should return false for invalid clock request"
-              (ticktok ?host ?clock => false))
+        (fact :unit "should return fail for invalid clock request"
+              (ticktok ?host ?clock)) => (throws Exception)
         ?host ?clock
         "" {}
         ))
