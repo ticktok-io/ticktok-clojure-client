@@ -30,8 +30,3 @@
       (= ::s/invalid parsed-clock-request) (dom/invalid-input ::dom/clock-request clock-request)
       :else
       (get-clock (:host parsed-config) parsed-clock-request))))
-
-(def cl {:name "myclock"
-         :schedule "every.5.seconds"})
-
-(s/explain ::dom/clock-request cl)

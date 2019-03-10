@@ -48,5 +48,4 @@
   (is-valid? ::clock-request clock-req))
 
 (defn invalid-input [type input]
-  (println "----------- kdkdkd " type " ------ "  input)
   (throw (ex-info "Invalid input" (s/explain-data type input))))
