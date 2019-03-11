@@ -35,9 +35,8 @@
     nil))
 
 (defn stop-rabbit []
-  (let [conn (:conn @rabbit)
-        ch (:chan @rabbit)]
-    (rmq/close ch)
+  (let [{:keys [conn chan]} @rabbit]
+    (rmq/close chan)
     (rmq/close conn)
     (swap! rabbit assoc :conn nil :chan nil)
     (println "rabbit driver stopped")
