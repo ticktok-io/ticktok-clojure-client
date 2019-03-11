@@ -17,9 +17,14 @@
 
 (s/def ::uri string?)
 
-(s/def ::channel (s/keys :req [::queue ::uri]))
+(s/def ::channel (s/keys :req-un [::queue ::uri]))
 
-(s/def ::clock-request (s/keys :req-un [::name ::schedule]))
+(s/fdef ::callback
+        :args any?
+        :ret any?)
+
+(s/def ::clock-request (s/keys :req-un [::name ::schedule]
+                               :op-un [::callback]))
 
 (s/def ::url string?)
 
@@ -34,6 +39,9 @@
 (defn is-valid? [type input]
   (let [parsed (s/conform type input)]
     (not= parsed ::s/invalid)))
+
+(defn conform-clock [clock]
+  (s/conform ::clock clock))
 
 (defn conform-config [config]
   (s/conform ::config config))
