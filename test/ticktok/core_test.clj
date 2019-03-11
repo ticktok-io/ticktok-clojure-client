@@ -27,7 +27,7 @@
 
 (defn make-clock-request []
   {:name "myclock"
-   :schedule "every.5.seconds"})
+   :schedule "Every.5.Seconds"})
 
 (defn make-clock-from [clock-req]
   (let [body {::channel {::queue "queue.it"
