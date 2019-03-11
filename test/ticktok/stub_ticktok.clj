@@ -16,28 +16,60 @@
                        :request nil
                        :response nil}))
 
+(defonce rabbit (atom {:conn
+                       :chan}))
+
 (def ^{:const true}
-  default-exchange-name "")
+  exchange-name "ticktok.fanout.ct")
+
+(def qname "clock.ct")
+
+(def rabbit-host "http://localhost:15672")
+
+(defn start-rabbit []
+  (let [conn  (rmq/connect)
+        ch    (lch/open conn)]
+    (swap! rabbit assoc :conn conn :chan ch)
+    nil))
+
+(defn stop-rabbit []
+  (let [conn (:conn rabbit)
+        ch (:chan rabbit)]
+    (rmq/close ch)
+    (rmq/close conn)
+    (swap! rabbit assoc :conn nil :chan nil)
+    nil))
 
 (defn message-handler
   [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
   (println (format "[consumer] Received a message: %s, delivery tag: %d, content type: %s, type: %s"
                    (String. payload "UTF-8") delivery-tag content-type type)))
 
-(defn rabbit
-  [& args]
-  (let [conn  (rmq/connect)
-        ch    (lch/open conn)
-        qname "langohr.examples.hello-world"]
-    (println (format "[main] Connected. Channel id: %d" (.getChannelNumber ch)))
-    (lq/declare ch qname {:exclusive false :auto-delete true})
-    (lc/subscribe ch qname message-handler {:auto-ack true})
-    (lb/publish ch default-exchange-name qname "Hello!" {:content-type "text/plain" :type "greetings.hi"})
-    (Thread/sleep 2000)
-    (println "[main] Disconnecting...")
-    (rmq/close ch)
-    (rmq/close conn)))
+(defn send-tick []
+  (lb/publish (:chan rabbit) exchange-name "" "my.tick" {:content-type "text/plain"}))
 
+(defn subscribe [qname callback]
+  (let [ch (:chan rabbit)
+        handler    (fn [(:chan rabbit) {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
+                     (println (format "[consumer] received %s" (String. payload "UTF-8")))
+                     (callback))]
+    (lq/declare ch qname {:exclusive false :auto-delete true})
+    (lq/bind ch qname exchange-name)
+    (lc/subscribe ch qname handler {:auto-ack true}))
+  nil)
+
+(defn bind-queue [qname callback]
+  (let [ch (:chan rabbit)]
+    (le/declare ch exchange-name "fanout" {:durable false :auto-delete true})
+    (subscribe qname callback)))
+
+(defn make-clock-from [clock-req]
+  (let [body {:channel {:queue qname
+                        :uri rabbit-host}
+              :name (:name clock-req)
+              :schedule (:schedule clock-req)}]
+    {:status 201
+     :body (json/write-str body)}))
 
 (defn respond-with [server res]
   (swap! server assoc :response res)
@@ -46,6 +78,7 @@
 (defn clock-handler [req]
   (let [res (get @server :response)]
     (put! (get @server :request) req)
+    (bind-queue (get-in res [:channel :queue]) (:callback req))
     (println "stub ticktok got" (:body req) "and respond with" res)
     res))
 
@@ -62,10 +95,12 @@
     (when-not (nil? inst)
       (inst :timeout 100)
       (swap! server assoc :instance nil :request nil :response nil)
+      (stop-rabbit)
       (println "stub ticktok stopped")
       nil)))
 
 (defn start []
+  (start-rabbit)
   (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
   (println "stub ticktok started")
   server)

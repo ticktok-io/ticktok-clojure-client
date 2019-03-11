@@ -12,7 +12,6 @@
 
 (def config {:host host :token "my.token"})
 
-
 (defn start-ticktok []
   (swap! state assoc :stub-ticktok (stub/start)))
 
@@ -27,16 +26,7 @@
 
 (defn make-clock-request []
   {:name "myclock"
-   :schedule "Every.5.Seconds"})
-
-(defn make-clock-from [clock-req]
-  (let [body {::channel {::queue "queue.it"
-                         ::uri "rabbit.uri"}
-              ::name (:name clock-req)
-              ::schedule (:schedule clock-req)}]
-    {:status 201
-     :body (json/write-str body)}))
-
+   :schedule "every.5.seconds"})
 
 (facts :e2e "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
@@ -47,10 +37,11 @@
                                      (ticktok config clock-request) => false
                                      (:body (stub/incoming-request (stub-ticktok))) => clock-request)))
          (let [clock-request (make-clock-request)
-               clock (make-clock-from clock-request)]
+               clock (stub/make-clock-from clock-request)]
            (against-background [(before :facts (stub/respond-with (stub-ticktok) clock))]
                                (fact "should return clock details"
                                      (ticktok config clock-request) => (:body clock))))))
+
 (facts :unit "about clock validity"
        (tabular
         (fact :unit "should return fail for invalid clock request"
