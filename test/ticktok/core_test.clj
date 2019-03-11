@@ -43,7 +43,7 @@
 (facts :unit "about clock validity"
        (tabular
         (fact :unit "should return fail for invalid clock request"
-              (ticktok ?host ?clock)) => (throws Exception)
+              (ticktok ?host ?clock)) => (throws RuntimeException #"")
         ?host ?clock
         "" {}
         ))
