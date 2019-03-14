@@ -54,7 +54,6 @@
       true)
     true))
 
-
 (defn stop-rabbit! []
   (when (running)
     (let [[chan conn] (rmq-chan-conn)]
@@ -64,6 +63,42 @@
       (println "rabbit stub stopped")
       true))
   true)
+
+(defn clock-handler [req]
+  (let [res (@server :response)]
+    (put! (@server :request) req)
+    (println "stub ticktok got" (:body req) "and respond with" res)
+    res))
+
+(defroutes api-routes
+  (context "/api/v1/clocks" []
+           (POST "/" [] clock-handler)))
+(def app
+  (-> (handler/site api-routes)
+      (middleware/wrap-json-body {:keywords? true})))
+
+(defn start-server! []
+  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
+  nil)
+
+(defn stop-server! []
+  (swap! server assoc :instance nil :request nil :response nil)
+  nil)
+
+
+(defn stop! [server]
+  (let [inst (get @server :instance)]
+    (when-not (nil? inst)
+      (inst :timeout 100)
+      (stop-server!)
+      (stop-rabbit!)
+      (println "stub ticktok stopped")
+      nil)))
+
+(defn start! []
+  (start-server!)
+  (println "stub ticktok started")
+  server)
 
 (defn send-tick []
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
@@ -80,59 +115,32 @@
     (println "queue " qname " is bound to " exchange-name)
     nil))
 
-(defn make-clock-from [clock-req]
-  (let [body {:channel {:queue qname
+(defn make-clock-from
+  ([clock-req]
+   (make-clock-from clock-req qname))
+  ([clock-req qname]
+   (let [body {:channel {:queue qname
                         :uri rabbit-host}
               :name (:name clock-req)
               :schedule (:schedule clock-req)
               :id "my.id"
               :url "my.url"}]
     {:status 201
-     :body (json/write-str body)}))
+     :body (json/write-str body)})))
 
 (defn respond-with [server res]
   (swap! server assoc :response res)
   (println "stub will response with " (@server :response))
   nil)
 
+(defn incoming-request [server]
+  (let [c (@server :request)
+        req (<!! c)]
+    req))
+
 (defn schedule-ticks []
   (let [res (@server :response)
         q (get-in res [:channel :queue])]
+    (start-rabbit!)
     (bind-queue qname)
     nil))
-
-(defn clock-handler [req]
-  (let [res (@server :response)]
-    (put! (@server :request) req)
-    (println "stub ticktok got" (:body req) "and respond with" res)
-    res))
-
-(defroutes api-routes
-  (context "/api/v1/clocks" []
-           (POST "/" [] clock-handler)))
-
-(def app
-  (-> (handler/site api-routes)
-      (middleware/wrap-json-body {:keywords? true})))
-
-(defn stop [server]
-  (let [inst (get @server :instance)]
-    (when-not (nil? inst)
-      (inst :timeout 100)
-      (swap! server assoc :instance nil :request nil :response nil)
-      (stop-rabbit!)
-      (println "stub ticktok stopped")
-      nil)))
-
-(defn start []
-  (start-rabbit!)
-  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
-  (println "stub ticktok started")
-  server)
-
-(defn incoming-request [server]
-  (println "incoming request")
-  (let [c (@server :request)
-        req (<!! c)]
-    (println "incoming " req)
-    req))

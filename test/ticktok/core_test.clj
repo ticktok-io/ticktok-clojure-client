@@ -13,10 +13,10 @@
 (def config {:host host :token "my.token"})
 
 (defn start-ticktok []
-  (swap! state assoc :stub-ticktok (stub/start)))
+  (swap! state assoc :stub-ticktok (stub/start!)))
 
 (defn stop-ticktok []
-  (swap! state update :stub-ticktok stub/stop))
+  (swap! state update :stub-ticktok stub/stop!))
 
 (defn stub-ticktok []
   (get @state :stub-ticktok))
@@ -67,8 +67,13 @@
                   (fact "should ask from ticktok server clock"
                         (stub-ticktok-incoming-request) => (clock-from clock-request)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
-                  (fact "should fail if failed to parse ticktok server response"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock")))))
+                  (fact "should fail if ticktok server respond with invalid clock"
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock"))
+                (with-state-changes [(before :contents (stub-ticktok-respond-with-clock))]
+                  (fact "should fail if failed to connect to rabbit"
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue")
+                  (fact "should fail if queue wasn't found"
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue")))))
 
 
 (comment (facts :unit "about clock validity"

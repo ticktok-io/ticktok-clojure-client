@@ -4,16 +4,10 @@
             [clojure.string :as string]
             [ticktok.domain :as dom]
             [clojure.spec.alpha :as s]
-            [ticktok.rabbit :as rabbit]))
+            [ticktok.rabbit :as rabbit]
+            [ticktok.utils :refer [fail-with]]))
 
 (def api "/api/v1/clocks")
-
-(defn fail-with
-  ([msg]
-   (fail-with msg {}))
-  ([msg details]
-   (println "error:" msg ", details:" details)
-   (throw (ex-info msg details))))
 
 (defn fetch-clock [host clock-req]
   (let [options {:headers  {"Content-Type" "application/json"}
@@ -27,9 +21,6 @@
                         (if (= ::s/invalid cl)
                           (fail-with  "Failed to parse clock" {:clock raw})
                           cl)))]
-    ;(println "status " status)
-    ;(println "error " error)
-    ;(println "body " body)
     (if (not= status 201)
       (fail-with  "Failed to fetch clock" {:status status
                                            :request clock-req})
@@ -38,7 +29,6 @@
 (defn subscribe [clock clock-req]
   (let [q (get-in clock [:channel :queue])
         callback (:callback clock-req)]
-    (println "subscribing " q)
     (rabbit/subscribe q callback)
     nil))
 
@@ -51,6 +41,5 @@
       (= ::s/invalid parsed-clock-request) (dom/invalid-input ::dom/clock-request clock-request)
       :else
       (let [clock (fetch-clock (:host parsed-config) parsed-clock-request)]
-        (println "subscribing " clock)
         (subscribe clock parsed-clock-request)
         clock))))
