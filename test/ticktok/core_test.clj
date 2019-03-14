@@ -47,7 +47,9 @@
   true)
 
 (defn stub-ticktok-respond-with-invalid-clock []
-  (stub-respond-with (stub/make-clock-from {})))
+  (println "stub-ticktok-respond-with-invalid-clock")
+  (stub-respond-with (stub/make-clock-from {}))
+  true)
 
 (defn clock-from [clock-req]
   (select-keys clock-req [:name :schedule]))
@@ -55,13 +57,16 @@
 (facts "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
-         (facts "when ticktok server not found"
+         (facts "when ticktok server failed to respond"
                 (with-state-changes [(before :contents (stub-ticktok-is-not-found))]
                   (fact "should fail if ticktok server not found"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock")
                   (fact "should ask from ticktok server clock"
-                        (:body (stub/incoming-request (stub-ticktok))) => (clock-from clock-request))
-                  ))))
+                        (:body (stub/incoming-request (stub-ticktok))) => (clock-from clock-request)))
+                (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
+                  (fact :cur "should fail if failed to parse ticktok server response"
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock")))))
+
 
 (comment (facts :unit "about clock validity"
                 (tabular
@@ -73,7 +78,7 @@
 
 
 (comment (fact  "should fail if failed to parse ticktok server response"
-                (against-background (stub-ticktok-respond-with-invalid-clock) => true)
+                (against-background  => true)
                 (ticktok config clock-request)))
 
 (comment (fact  "should fail if queue wasn't found"
