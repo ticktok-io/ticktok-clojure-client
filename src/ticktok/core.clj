@@ -8,6 +8,12 @@
 
 (def api "/api/v1/clocks")
 
+(defn fail-with
+  ([msg]
+   (fail-with msg {}))
+  ([msg details]
+   (println "error:" msg ", details:" details)
+   (throw (ex-info msg details))))
 
 (defn fetch-clock [host clock-req]
   (let [options {:headers  {"Content-Type" "application/json"}
@@ -18,33 +24,33 @@
         parse-clock (fn [raw]
                       (let [cl-map (json/read-str raw :key-fn keyword)
                             cl (dom/conform-clock cl-map)]
-                        (println "cl " cl)
                         (if (= ::s/invalid cl)
-                          (dom/invalid-input ::dom/clock cl-map)
+                          (fail-with  "Failed to parse clock" {:clock raw})
                           cl)))]
-    (println "status " status)
-    (println "error " error)
-    (println "body " body)
+    ;(println "status " status)
+    ;(println "error " error)
+    ;(println "body " body)
     (if (not= status 201)
-      (throw (ex-info "Failed to fetch clock" {:status status
-                                               :request clock-req}))
+      (fail-with  "Failed to fetch clock" {:status status
+                                           :request clock-req})
       (parse-clock body))))
 
 (defn subscribe [clock clock-req]
   (let [q (get-in clock [:channel :queue])
         callback (:callback clock-req)]
+    (println "subscribing " q)
     (rabbit/subscribe q callback)
     nil))
 
 (defn ticktok [config clock-request]
   (let [parsed-config (dom/conform-config config)
         parsed-clock-request (dom/conform-clock-request clock-request)]
-    (println "config " parsed-config)
-    (println "clock req " parsed-clock-request)
+    (println "ticktok called: " parsed-config ", " parsed-clock-request)
     (cond
       (= ::s/invalid parsed-config) (dom/invalid-input ::dom/config config)
       (= ::s/invalid parsed-clock-request) (dom/invalid-input ::dom/clock-request clock-request)
       :else
       (let [clock (fetch-clock (:host parsed-config) parsed-clock-request)]
+        (println "subscribing " clock)
         (subscribe clock parsed-clock-request)
         clock))))

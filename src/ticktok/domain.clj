@@ -36,10 +36,6 @@
 
 (s/def ::config (s/keys :req-un [::host ::token]))
 
-(defn is-valid? [type input]
-  (let [parsed (s/conform type input)]
-    (not= parsed ::s/invalid)))
-
 (defn conform-clock [clock]
   (s/conform ::clock clock))
 
@@ -48,12 +44,6 @@
 
 (defn conform-clock-request [clock-req]
   (s/conform ::clock-request clock-req))
-
-(defn valid-config? [config]
-  (is-valid? ::config config))
-
-(defn valid-clock-request? [clock-req]
-  (is-valid? ::clock-request clock-req))
 
 (defn invalid-input [type input]
   (throw (ex-info "Invalid input" (s/explain-data type input))))

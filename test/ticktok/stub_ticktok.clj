@@ -17,9 +17,8 @@
 (defonce server (atom {:instance nil
                        :request nil
                        :response nil}))
-
-(defonce rabbit (atom {:conn
-                       :chan}))
+(defonce rabbit (atom {:conn nil
+                       :chan nil}))
 
 (def exchange-name "ticktok.fanout.ct")
 
@@ -27,28 +26,52 @@
 
 (def rabbit-host "http://localhost:15672")
 
-(defn start-rabbit []
-  (let [conn  (rmq/connect)
-        ch    (lch/open conn)]
-    (swap! rabbit assoc :conn conn :chan ch)
-    (println "rabbit driver started")
-    nil))
+(defn rmq-chan []
+  (:chan @rabbit))
 
-(defn stop-rabbit []
-  (let [{:keys [conn chan]} @rabbit]
-    (rmq/close chan)
-    (rmq/close conn)
-    (swap! rabbit assoc :conn nil :chan nil)
-    (println "rabbit driver stopped")
-    nil))
+(defn rmq-conn []
+  (:conn @rabbit))
+
+(defn rmq-chan-conn []
+  [(rmq-chan), (rmq-conn)])
+
+(defn not-running []
+  (let [[chan conn] (rmq-chan-conn)]
+    (println "not-running: " chan conn)
+    (every? nil? [chan conn])))
+
+(defn running []
+  (let [[chan conn] (rmq-chan-conn)]
+    (println "running: " chan conn)
+    (every? some? [chan conn])))
+
+(defn start-rabbit! []
+  (when (not-running)
+    (let [conn  (rmq/connect)
+          ch    (lch/open conn)]
+      (swap! rabbit assoc :conn conn :chan ch)
+      (println "rabbit stub started")
+      true)
+    true))
+
+
+(defn stop-rabbit! []
+  (when (running)
+    (let [[chan conn] (rmq-chan-conn)]
+      (println (rmq/close chan))
+      (println (rmq/close conn))
+      (swap! rabbit assoc :conn nil :chan nil)
+      (println "rabbit stub stopped")
+      true))
+  true)
 
 (defn send-tick []
-  (lb/publish (:chan rabbit) exchange-name "" "my.tick" {:content-type "text/plain"})
+  (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
   true)
 
 (defn bind-queue [qname]
   (println "bind " qname)
-  (let [ch (:chan @rabbit)]
+  (let [ch (rmq-chan)]
     (le/declare ch exchange-name "fanout" {:durable false :auto-delete true})
     (println "exchange " exchange-name " created")
     (lq/declare ch qname {:exclusive false :auto-delete true})
@@ -69,16 +92,18 @@
 
 (defn respond-with [server res]
   (swap! server assoc :response res)
+  (println "stub will response with " (@server :response))
   nil)
 
 (defn schedule-ticks []
-  (let [res (get @server :response)
-        q (get-in res [:channel :queue])]    (bind-queue qname)
+  (let [res (@server :response)
+        q (get-in res [:channel :queue])]
+    (bind-queue qname)
     nil))
 
 (defn clock-handler [req]
-  (let [res (get @server :response)]
-    (put! (get @server :request) req)
+  (let [res (@server :response)]
+    (put! (@server :request) req)
     (println "stub ticktok got" (:body req) "and respond with" res)
     res))
 
@@ -95,17 +120,19 @@
     (when-not (nil? inst)
       (inst :timeout 100)
       (swap! server assoc :instance nil :request nil :response nil)
-      (stop-rabbit)
+      (stop-rabbit!)
       (println "stub ticktok stopped")
       nil)))
 
 (defn start []
-  (start-rabbit)
+  (start-rabbit!)
   (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
   (println "stub ticktok started")
   server)
 
 (defn incoming-request [server]
-  (let [c (get @server :request)
+  (println "incoming request")
+  (let [c (@server :request)
         req (<!! c)]
+    (println "incoming " req)
     req))
