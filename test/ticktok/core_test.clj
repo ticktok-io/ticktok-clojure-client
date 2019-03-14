@@ -36,6 +36,9 @@
 
 (def clock (stub/make-clock-from clock-request))
 
+(defn stub-ticktok-incoming-request []
+  (:body (stub/incoming-request (stub-ticktok))))
+
 (defn stub-ticktok-respond-with-clock []
   (println "stub-ticktok-respond-with-clock")
   (stub-respond-with clock)
@@ -62,9 +65,9 @@
                   (fact "should fail if ticktok server not found"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock")
                   (fact "should ask from ticktok server clock"
-                        (:body (stub/incoming-request (stub-ticktok))) => (clock-from clock-request)))
+                        (stub-ticktok-incoming-request) => (clock-from clock-request)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
-                  (fact :cur "should fail if failed to parse ticktok server response"
+                  (fact "should fail if failed to parse ticktok server response"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock")))))
 
 
