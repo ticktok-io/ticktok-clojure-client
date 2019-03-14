@@ -12,7 +12,8 @@
             [langohr.queue     :as lq]
             [langohr.exchange  :as le]
             [langohr.consumers :as lc]
-            [langohr.basic     :as lb]))
+            [langohr.basic     :as lb]
+            [ticktok.utils :refer [pretty]]))
 
 (defonce server (atom {:instance nil
                        :request nil
@@ -37,12 +38,10 @@
 
 (defn not-running []
   (let [[chan conn] (rmq-chan-conn)]
-    (println "not-running: " chan conn)
     (every? nil? [chan conn])))
 
 (defn running []
   (let [[chan conn] (rmq-chan-conn)]
-    (println "running: " chan conn)
     (every? some? [chan conn])))
 
 (defn start-rabbit! []
@@ -67,7 +66,10 @@
 (defn clock-handler [req]
   (let [res (@server :response)]
     (put! (@server :request) req)
-    (println "stub ticktok got" (:body req) "and respond with" res)
+    (println "stub ticktok got")
+    (pretty (:body req))
+    (println "and respond with")
+    (pretty res)
     res))
 
 (defroutes api-routes

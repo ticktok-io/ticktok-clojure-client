@@ -19,12 +19,10 @@
 
 (defn not-running []
   (let [[chan conn] (rmq-chan-conn)]
-    (println "not-running: " chan conn)
     (every? nil? [chan conn])))
 
 (defn running []
   (let [[chan conn] (rmq-chan-conn)]
-    (println "running: " chan conn)
     (every? some? [chan conn])))
 
 (defmacro safe [body]

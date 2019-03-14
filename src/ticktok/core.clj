@@ -5,7 +5,7 @@
             [ticktok.domain :as dom]
             [clojure.spec.alpha :as s]
             [ticktok.rabbit :as rabbit]
-            [ticktok.utils :refer [fail-with]]))
+            [ticktok.utils :refer [fail-with pretty]]))
 
 (def api "/api/v1/clocks")
 
@@ -35,7 +35,9 @@
 (defn ticktok [config clock-request]
   (let [parsed-config (dom/conform-config config)
         parsed-clock-request (dom/conform-clock-request clock-request)]
-    (println "ticktok called: " parsed-config ", " parsed-clock-request)
+    (prn "ticktok called:")
+    (pretty parsed-config)
+    (pretty parsed-clock-request)
     (cond
       (= ::s/invalid parsed-config) (dom/invalid-input ::dom/config config)
       (= ::s/invalid parsed-clock-request) (dom/invalid-input ::dom/clock-request clock-request)

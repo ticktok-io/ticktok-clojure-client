@@ -1,6 +1,8 @@
 (ns ticktok.core-test
   (:require [clojure.test :refer :all]
+            [clojure.string :as string]
             [ticktok.core :refer :all]
+            [ticktok.utils :refer [pretty]]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [clojure.data.json :as json]
@@ -62,18 +64,18 @@
                             (after :contents (stop-ticktok))]
          (facts "when ticktok server failed to respond"
                 (with-state-changes [(before :contents (stub-ticktok-is-not-found))]
-                  (fact "should fail if ticktok server not found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock")
+                  (fact :deb N"should fail if ticktok server not found"
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 404))
                   (fact "should ask from ticktok server clock"
                         (stub-ticktok-incoming-request) => (clock-from clock-request)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
                   (fact "should fail if ticktok server respond with invalid clock"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock"))
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-clock))]
                   (fact "should fail if failed to connect to rabbit"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue")
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(contains? (ex-data %) :queue))
                   (fact "should fail if queue wasn't found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue")))))
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "NOT_FOUND"))))))
 
 
 (comment (facts :unit "about clock validity"
