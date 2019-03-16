@@ -13,7 +13,7 @@
             [langohr.exchange  :as le]
             [langohr.consumers :as lc]
             [langohr.basic     :as lb]
-            [ticktok.utils :refer [pretty]]))
+            [ticktok.utils :refer [pretty safe]]))
 
 (defonce server (atom {:instance nil
                        :request nil
@@ -53,11 +53,31 @@
       true)
     true))
 
+(defn clear-resources []
+  (let [ch (rmq-chan)]
+    (safe (lq/delete ch qname))
+    (println qname "deleted")
+    (safe (le/delete ch exchange-name))
+    (println exchange-name "deleted")))
+
+(defn close-rabbit! []
+  (let [[chan conn] (rmq-chan-conn)
+        closer #(when (rmq/open? %)
+                  (rmq/close %))]
+    (closer chan)
+    (println "channel closed")
+    (closer conn)
+    (println "connection closed")
+    true))
+
 (defn stop-rabbit! []
   (when (running)
-    (let [[chan conn] (rmq-chan-conn)]
-      (println (rmq/close chan))
-      (println (rmq/close conn))
+    (let [[chan conn] (rmq-chan-conn)
+          closer #(when (rmq/open? %)
+                    (rmq/close %))]
+      (clear-resources)
+      (close-rabbit!)
+      (println "connection closed")
       (swap! rabbit assoc :conn nil :chan nil)
       (println "rabbit stub stopped")
       true))
@@ -141,8 +161,8 @@
     req))
 
 (defn schedule-ticks []
-  (let [res (@server :response)
-        q (get-in res [:channel :queue])]
+  (do
     (start-rabbit!)
     (bind-queue qname)
+    (println "ticks are scheduled")
     nil))

@@ -25,17 +25,11 @@
   (let [[chan conn] (rmq-chan-conn)]
     (every? some? [chan conn])))
 
-(defmacro safe [body]
-  `(try
-     ~body
-     (catch Exception e#
-       (str "caught exception: " (.getMessage e#)))))
 
 (defn start-rabbit! []
   (when (not-running)
     (let [conn  (rmq/connect)
           ch    (lch/open conn)]
-      (println "start rabbit " ch conn)
       (swap! rabbit assoc :conn conn :chan ch)
       (println "rabbit prod started")
       true)
@@ -43,23 +37,28 @@
 
 (defn stop-rabbit! []
   (when (running)
-    (let [[chan conn] (rmq-chan-conn)]
-      (println (rmq/close chan))
-      (println (rmq/close conn))
+    (let [[chan conn] (rmq-chan-conn)
+          closer #(when (rmq/open? %)
+                    (rmq/close %))]
+      (closer chan)
+      (closer conn)
       (swap! rabbit assoc :conn nil :chan nil)
       (println "rabbit prod stopped")
       true))
   true)
 
+
 (defn subscribe [qname callback]
   (let [handler (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
-                  (println (format "[consumer] received %s" (String. payload "UTF-8")))
-                  (callback))]
+                  (let [msg (String. payload "UTF-8")
+                        r (callback)]
+                    (println (format "[consumer] received %s" msg))
+                    (println "callback returned " r)))]
     (try
       (do
         (start-rabbit!)
+        (println "going to subscribe " qname)
         (lc/subscribe (rmq-chan) qname handler {:auto-ack true}))
       (catch Exception e
-        (println (.getMessage e))
         (fail-with "Failed to subscribe queue" {:queue qname
                                                 :error (.getMessage e)})))))

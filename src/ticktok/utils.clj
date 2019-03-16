@@ -13,3 +13,9 @@
    (pretty msg)
    (pretty details)
    (throw (ex-info msg details))))
+
+(defmacro safe [body]
+  `(try
+     ~body
+     (catch Exception e#
+       (str "caught exception: " (.getMessage e#)))))

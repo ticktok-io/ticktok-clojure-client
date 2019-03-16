@@ -6,7 +6,7 @@
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [clojure.data.json :as json]
-            [clojure.core.async :as async :refer [chan put! <!!]]))
+            [clojure.core.async :as async :refer [chan put! <!! close!]]))
 
 (def host  "http://localhost:8080")
 
@@ -30,9 +30,11 @@
   ([]
    (make-clock-request #()))
   ([callback]
-   {:name "myclock"
-    :schedule "every.5.seconds"
-    :callback callback}))
+   (let [req {:name "myclock"
+              :schedule "every.5.seconds"
+              :callback callback}]
+     (println "deb req" req)
+     req)))
 
 (def clock-request (make-clock-request))
 
@@ -56,15 +58,22 @@
   (stub-respond-with (stub/make-clock-from {}))
   true)
 
+(defn stub-ticktok-respond-with-clock-and-schedule-ticks [clock]
+  (do
+    (stub-respond-with clock)
+    (stub/schedule-ticks)
+    true))
+
 (defn clock-from [clock-req]
   (select-keys clock-req [:name :schedule]))
 
-(facts "about ticktok"
+
+(facts :f "when ticktok failed to fetch clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
          (facts "when ticktok server failed to respond"
                 (with-state-changes [(before :contents (stub-ticktok-is-not-found))]
-                  (fact :deb N"should fail if ticktok server not found"
+                  (fact "should fail if ticktok server not found"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 404))
                   (fact "should ask from ticktok server clock"
                         (stub-ticktok-incoming-request) => (clock-from clock-request)))
@@ -75,9 +84,41 @@
                   (fact "should fail if failed to connect to rabbit"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(contains? (ex-data %) :queue))
                   (fact "should fail if queue wasn't found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "NOT_FOUND"))))))
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "NOT_FOUND"))))
+         ))
 
+(facts :s "when clock is successfully sent"
+       (with-state-changes [(before :contents (start-ticktok))
+                            (after :contents (do
+                                               (stop-ticktok)
+                                               (stub/clear-resources)))]
+         (with-state-changes [(before :contents (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
+           (let [ch (chan 1)
+                 clock-request (make-clock-request #(let []
+                                                      (println "i got tick")
+                                                      (put! ch "got tick")
+                                                      true))
+                 clock (stub/make-clock-from clock-request)
+                 is-inovked #(let [m (<!! ch)]
+                               (println "msg is" m)
+                               (close! ch)
+                               (not= nil m))]
+             (fact "should invoke callback upon tick"
+                   (ticktok config clock-request) => true
+                   (stub/send-tick) => true
+                   (is-inovked) => true
+                   )))))
 
+(comment (let [ch (chan 1)
+               clock-request (make-clock-request #(put! ch "got tick"))
+               clock (stub/make-clock-from clock-request)
+               is-inovked #(let [msg (<!! ch)]
+                             (println "callback msg " msg)
+                             (not (nil? msg)))]
+           (against-background [(before :facts (do
+                                                 (stub/respond-with (stub-ticktok) clock)
+                                                 (stub/schedule-ticks)))]
+                               )))
 (comment (facts :unit "about clock validity"
                 (tabular
                  (fact :unit "should return fail for invalid clock request"
@@ -85,27 +126,3 @@
                  ?host ?clock
                  "" {}
                  )))
-
-
-(comment (fact  "should fail if failed to parse ticktok server response"
-                (against-background  => true)
-                (ticktok config clock-request)))
-
-(comment (fact  "should fail if queue wasn't found"
-                (stub-ticktok-respond-with-clock) => true
-                (ticktok config clock-request)) => (throws RuntimeException #"Failed to find queue"))
-
-
-
-(comment (let [ch (chan 1)
-               clock-request (make-clock-request #(put! ch "got tick"))
-               clock (stub/make-clock-from clock-request)
-               is-inovked #(nil? (<!! ch))]
-           (against-background [(before :facts (do
-                                                 (stub/respond-with (stub-ticktok) clock)
-                                                 (stub/schedule-ticks)))]
-                               (fact "should invoke callback upon tick"
-                                     (ticktok config clock-request) => (:body clock)
-                                     (stub/send-tick) => true
-                                     (is-inovked) => true
-                                     ))))

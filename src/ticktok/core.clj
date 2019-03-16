@@ -30,6 +30,7 @@
   (let [q (get-in clock [:channel :queue])
         callback (:callback clock-req)]
     (rabbit/subscribe q callback)
+    (println q "successfully subscribed with " callback)
     nil))
 
 (defn ticktok [config clock-request]
@@ -44,4 +45,4 @@
       :else
       (let [clock (fetch-clock (:host parsed-config) parsed-clock-request)]
         (subscribe clock parsed-clock-request)
-        clock))))
+        true))))
