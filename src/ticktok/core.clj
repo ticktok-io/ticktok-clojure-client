@@ -30,15 +30,15 @@
   (let [q (get-in clock [:channel :queue])
         callback (:callback clock-req)]
     (rabbit/subscribe q callback)
-    (println q "successfully subscribed with " callback)
+    ;(println q "successfully subscribed with " callback)
     nil))
 
 (defn ticktok [config clock-request]
   (let [parsed-config (dom/conform-config config)
         parsed-clock-request (dom/conform-clock-request clock-request)]
-    (prn "ticktok called:")
-    (pretty parsed-config)
-    (pretty parsed-clock-request)
+    ;(println "ticktok called:")
+    ;(pretty parsed-config)
+    ;(pretty parsed-clock-request)
     (cond
       (= ::s/invalid parsed-config) (dom/invalid-input ::dom/config config)
       (= ::s/invalid parsed-clock-request) (dom/invalid-input ::dom/clock-request clock-request)

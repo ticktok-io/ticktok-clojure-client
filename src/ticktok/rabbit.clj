@@ -4,7 +4,7 @@
             [langohr.queue     :as lq]
             [langohr.consumers :as lc]
             [langohr.basic     :as lb]
-            [ticktok.utils :refer [fail-with]]))
+            [ticktok.utils :refer [fail-with pretty]]))
 
 (defonce rabbit (atom {:chan nil :conn nil}))
 
@@ -47,6 +47,11 @@
       true))
   true)
 
+(defn exception-handler [e qname]
+  (let [exp (Throwable->map e)]
+    (stop-rabbit!)
+    (fail-with "Failed to subscribe queue" {:queue qname
+                                            :error (:cause exp)})))
 
 (defn subscribe [qname callback]
   (let [handler (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
@@ -57,8 +62,5 @@
     (try
       (do
         (start-rabbit!)
-        (println "going to subscribe " qname)
         (lc/subscribe (rmq-chan) qname handler {:auto-ack true}))
-      (catch Exception e
-        (fail-with "Failed to subscribe queue" {:queue qname
-                                                :error (.getMessage e)})))))
+      (catch Exception e (exception-handler e qname)))))

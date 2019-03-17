@@ -33,7 +33,6 @@
    (let [req {:name "myclock"
               :schedule "every.5.seconds"
               :callback callback}]
-     (println "deb req" req)
      req)))
 
 (def clock-request (make-clock-request))
@@ -89,10 +88,8 @@
 
 (facts :s "when clock is successfully sent"
        (with-state-changes [(before :contents (start-ticktok))
-                            (after :contents (do
-                                               (stop-ticktok)
-                                               (stub/clear-resources)))]
-         (with-state-changes [(before :contents (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
+                            (after :contents (stop-ticktok))]
+         (with-state-changes [(before :facts(stub-ticktok-respond-with-clock-and-schedule-ticks clock))                              ]
            (let [ch (chan 1)
                  clock-request (make-clock-request #(let []
                                                       (println "i got tick")
@@ -109,16 +106,6 @@
                    (is-inovked) => true
                    )))))
 
-(comment (let [ch (chan 1)
-               clock-request (make-clock-request #(put! ch "got tick"))
-               clock (stub/make-clock-from clock-request)
-               is-inovked #(let [msg (<!! ch)]
-                             (println "callback msg " msg)
-                             (not (nil? msg)))]
-           (against-background [(before :facts (do
-                                                 (stub/respond-with (stub-ticktok) clock)
-                                                 (stub/schedule-ticks)))]
-                               )))
 (comment (facts :unit "about clock validity"
                 (tabular
                  (fact :unit "should return fail for invalid clock request"
