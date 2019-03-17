@@ -25,15 +25,13 @@
   (let [[chan conn] (rmq-chan-conn)]
     (every? some? [chan conn])))
 
-
 (defn start-rabbit! []
   (when (not-running)
     (let [conn  (rmq/connect)
           ch    (lch/open conn)]
       (swap! rabbit assoc :conn conn :chan ch)
-      (println "rabbit prod started")
-      true)
-    true))
+      (println "rabbit prod started")))
+  true)
 
 (defn stop-rabbit! []
   (when (running)
@@ -43,8 +41,7 @@
       (closer chan)
       (closer conn)
       (swap! rabbit assoc :conn nil :chan nil)
-      (println "rabbit prod stopped")
-      true))
+      (println "rabbit prod stopped")))
   true)
 
 (defn exception-handler [e qname]

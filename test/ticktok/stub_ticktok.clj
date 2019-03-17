@@ -49,38 +49,37 @@
     (let [conn  (rmq/connect)
           ch    (lch/open conn)]
       (swap! rabbit assoc :conn conn :chan ch)
-      (println "rabbit stub started")
-      true)
-    true))
+      (println "rabbit stub started")))
+  true)
 
-(defn clear-resources []
+(defn clear-resources! []
   (let [ch (rmq-chan)]
     (safe (lq/delete ch qname))
     (println qname "deleted")
     (safe (le/delete ch exchange-name))
-    (println exchange-name "deleted")))
+    (println exchange-name "deleted"))
+  nil)
 
 (defn close-rabbit! []
   (let [[chan conn] (rmq-chan-conn)
         closer #(when (rmq/open? %)
                   (rmq/close %))]
     (closer chan)
-    (println "channel closed")
+    (println "stub rabbit: channel closed")
     (closer conn)
-    (println "connection closed")
-    true))
+    (println "stub rabbit: connection closed")
+    )
+  nil)
 
 (defn stop-rabbit! []
   (when (running)
     (let [[chan conn] (rmq-chan-conn)
           closer #(when (rmq/open? %)
                     (rmq/close %))]
-      (clear-resources)
+      (clear-resources!)
       (close-rabbit!)
-      (println "connection closed")
       (swap! rabbit assoc :conn nil :chan nil)
-      (println "rabbit stub stopped")
-      true))
+      (println "rabbit stub stopped")))
   true)
 
 (defn clock-handler [req]

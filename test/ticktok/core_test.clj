@@ -66,7 +66,6 @@
 (defn clock-from [clock-req]
   (select-keys clock-req [:name :schedule]))
 
-
 (facts :f "when ticktok failed to fetch clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
@@ -106,10 +105,10 @@
                    (is-inovked) => true
                    )))))
 
-(comment (facts :unit "about clock validity"
-                (tabular
-                 (fact :unit "should return fail for invalid clock request"
-                       (ticktok ?host ?clock)) => (throws RuntimeException #"")
-                 ?host ?clock
-                 "" {}
-                 )))
+(facts :unit "about clock validity"
+       (tabular
+        (fact :unit "should return fail for invalid clock request"
+              (ticktok ?host ?clock)) => (throws RuntimeException #"")
+        ?host ?clock
+        "" {}
+        ))
