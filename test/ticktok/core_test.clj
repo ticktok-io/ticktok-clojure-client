@@ -71,8 +71,8 @@
                             (after :contents (stop-ticktok))]
          (facts "when ticktok server failed to respond"
                 (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
-                  (fact "should fail if ticktok server not found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 404))
+                  (fact "should fail if ticktok servenr not found"
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
                   (fact "should ask from ticktok server clock"
                         (stub-ticktok-incoming-request) => (clock-from clock-request)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
