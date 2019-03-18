@@ -47,9 +47,9 @@
   (stub-respond-with clock)
   true)
 
-(defn stub-ticktok-is-not-found []
-  (println "stub-ticktok-is-not-found")
-  (stub-respond-with {:status 404})
+(defn stub-ticktok-returned-bad-request []
+  (println "stub-ticktok-returned-bad-request")
+  (stub-respond-with {:status 400})
   true)
 
 (defn stub-ticktok-respond-with-invalid-clock []
@@ -70,7 +70,7 @@
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
          (facts "when ticktok server failed to respond"
-                (with-state-changes [(before :contents (stub-ticktok-is-not-found))]
+                (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
                   (fact "should fail if ticktok server not found"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 404))
                   (fact "should ask from ticktok server clock"
