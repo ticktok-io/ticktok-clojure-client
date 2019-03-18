@@ -82,7 +82,7 @@
                   (fact "should fail if failed to connect to rabbit"
                         (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(contains? (ex-data %) :queue))
                   (fact "should fail if queue wasn't found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "NOT_FOUND"))))
+                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "404"))))
          ))
 
 (facts :s "when clock is successfully sent"
