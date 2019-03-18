@@ -90,13 +90,9 @@
                             (after :contents (stop-ticktok))]
          (with-state-changes [(before :facts(stub-ticktok-respond-with-clock-and-schedule-ticks clock))                              ]
            (let [ch (chan 1)
-                 clock-request (make-clock-request #(let []
-                                                      (println "i got tick")
-                                                      (put! ch "got tick")
-                                                      true))
+                 clock-request (make-clock-request #(put! ch "got tick"))
                  clock (stub/make-clock-from clock-request)
                  is-inovked #(let [m (<!! ch)]
-                               (println "msg is" m)
                                (close! ch)
                                (not= nil m))]
              (fact "should invoke callback upon tick"

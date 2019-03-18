@@ -54,8 +54,8 @@
   (let [handler (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
                   (let [msg (String. payload "UTF-8")
                         r (callback)]
-                    (println (format "[consumer] received %s" msg))
-                    (println "callback returned " r)))]
+                    (println (format "[consumer] received %s, returned %s" msg r))
+                    r))]
     (try
       (do
         (start-rabbit!)
