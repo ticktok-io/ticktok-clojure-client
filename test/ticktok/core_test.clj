@@ -66,23 +66,29 @@
 (defn clock-from [clock-req]
   (select-keys clock-req [:name :schedule]))
 
+(defn register-clock
+  ([]
+   (register-clock clock-request))
+  ([req]
+   ((make-ticktok config) req)))
+
 (facts :f "when ticktok failed to fetch clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
          (facts "when ticktok server failed to respond"
                 (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
                   (fact "should fail if ticktok servenr not found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
+                        (register-clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
                   (fact "should ask from ticktok server clock"
                         (stub-ticktok-incoming-request) => (clock-from clock-request)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
                   (fact "should fail if ticktok server respond with invalid clock"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock)))
+                        (register-clock)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock)))
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-clock))]
                   (fact "should fail if failed to connect to rabbit"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(contains? (ex-data %) :queue))
+                        (register-clock)) => (throws RuntimeException #"Failed to subscribe queue" #(contains? (ex-data %) :queue))
                   (fact "should fail if queue wasn't found"
-                        (ticktok config clock-request)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "404"))))
+                        (register-clock)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "404"))))
          ))
 
 (facts :s "when clock is successfully sent"
@@ -96,7 +102,7 @@
                                (close! ch)
                                (not= nil m))]
              (fact "should invoke callback upon tick"
-                   (ticktok config clock-request) => true
+                   (register-clock clock-request) => true
                    (stub/send-tick) => true
                    (is-inovked) => true
                    )))))

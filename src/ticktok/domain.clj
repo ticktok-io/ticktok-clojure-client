@@ -45,5 +45,19 @@
 (defn conform-clock-request [clock-req]
   (s/conform ::clock-request clock-req))
 
+(defmulti conform
+  (fn [args]
+    (:type args)))
+
+(defmethod conform ::clock [{:keys [entity]}]
+  (s/conform ::clock entity))
+
+(defmethod conform ::clock-request [{:keys [entity]}]
+  (s/conform ::clock-request entity))
+
+(defmethod conform ::config [{:keys [entity]}]
+  (s/conform ::config entity))
+
+
 (defn invalid-input [type input]
   (throw (ex-info "Invalid input" (s/explain-data type input))))
