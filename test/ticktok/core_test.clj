@@ -12,8 +12,6 @@
 
 (def state (atom {:stub-ticktok nil}))
 
-(def config {:host host :token "my.token"})
-
 (defn start-ticktok []
   (swap! state assoc :stub-ticktok (stub/start!)))
 
@@ -38,6 +36,8 @@
 (def clock-request (make-clock-request))
 
 (def clock (stub/make-clock-from clock-request))
+
+(def config {:host host :token "my.token"})
 
 (defn stub-ticktok-incoming-request []
   (:body (stub/incoming-request (stub-ticktok))))
@@ -70,7 +70,9 @@
   ([]
    (register-clock clock-request))
   ([req]
-   ((make-ticktok config) req)))
+   (register-clock config req))
+  ([conf req]
+   ((make-ticktok conf) req)))
 
 (facts :f "when ticktok failed to fetch clock"
        (with-state-changes [(before :contents (start-ticktok))
@@ -88,8 +90,7 @@
                   (fact "should fail if failed to connect to rabbit"
                         (register-clock)) => (throws RuntimeException #"Failed to subscribe queue" #(contains? (ex-data %) :queue))
                   (fact "should fail if queue wasn't found"
-                        (register-clock)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "404"))))
-         ))
+                        (register-clock)) => (throws RuntimeException #"Failed to subscribe queue" #(string/includes? (:error (ex-data %)) "404"))))))
 
 (facts :s "when clock is successfully sent"
        (with-state-changes [(before :contents (start-ticktok))
@@ -110,7 +111,7 @@
 (facts :unit "about clock validity"
        (tabular
         (fact :unit "should return fail for invalid clock request"
-              (ticktok ?host ?clock)) => (throws RuntimeException #"")
+              (register-clock ?host ?clock)) => (throws RuntimeException #"")
         ?host ?clock
         "" {}
         ))
