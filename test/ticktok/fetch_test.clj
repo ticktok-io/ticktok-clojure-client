@@ -59,28 +59,19 @@
 (facts :f "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
-         (facts :f "when failed to fetch clock"
+         (facts "when failed to fetch clock"
 
                 (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
-                  (let [clock {:name "my.clock"
-                               :schedule "every.5.seconds"}]
-
-                    (fact "should fail if ticktok server not found"
-                          (fetch clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
-
-                    (fact "should ask from ticktok server clock"
-                          (stub-ticktok-incoming-request) => clock)))
+                  (fact "should fail if ticktok server not found"
+                        (fetch)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400)))
 
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
-
                   (fact "should fail if ticktok server respond with invalid clock"
                         (fetch)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock))))
 
          (facts "when ticktok respond with valid clock"
 
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-clock))]
-
-
                   (fact "should return clock details"
                           (fetch) => (contains {:channel (contains
                                                           {:queue string?

@@ -64,7 +64,7 @@
      (ticktok req))))
 
 
-(facts "about ticktok"
+(facts :f "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
@@ -80,7 +80,7 @@
                                (stub-ticktok-incoming-request) => (contains {:name (:name clock-request)
                                                                              :schedule (:schedule clock-request)})))))
 
-       (facts "when clock is successfully sent"
+       (facts :f "when clock is successfully sent"
 
                 (with-state-changes [(before :facts (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
                   (let [ch (chan 1)
@@ -94,17 +94,15 @@
                           (register-clock clock-request) => true
                           (stub/send-tick) => true
                           (is-inovked) => truthy
-                          )))))
+                          ))))))
 
-       )
-
-
-
-
-(facts :f "about clock validity"
+(facts "about clock validity"
        (tabular
         (fact "should return fail for invalid clock request"
-              (register-clock ?host ?clock)) => (throws RuntimeException #"")
+              (register-clock ?host ?clock)) => (throws RuntimeException #"Invalid input")
         ?host ?clock
-        "" {}
+        host {:name "my.clock"}
+        host {:name "my.clock" :schedule "Every.3.seconds"}
+        host {:name "my.clock" :schedule "every.0.seconds"}
+        "" {:name "my.clock" :schedule "every.3.seconds"}
         ))
