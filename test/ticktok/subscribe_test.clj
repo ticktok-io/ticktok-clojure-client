@@ -17,9 +17,7 @@
   ([uri]
    (subscribe-queue uri ""))
   ([uri qname]
-   (subscribe-queue uri qname #()))
-  ([uri qname callback]
-   (subscribe uri qname callback)
+   (subscribe-queue uri qname #())
    true))
 
 (facts "about subscribing to queue"
@@ -29,20 +27,4 @@
                     (subscribe-queue invalid-uri)) => (throws RuntimeException #"Failed to connect queue server")
 
               (fact "should fail if queue wasn't found"
-                    (subscribe-queue rabbit-uri "invalid.q")) => (throws RuntimeException #"Failed to subscribe queue"))
-
-       (facts "when successfully subscribed"
-
-              (with-state-changes [(before :facts (stub/schedule-ticks))
-                                   (after :facts (stub/stop-rabbit!))]
-                (let [ch (chan 1)
-                      callback #(put! ch "got tick")
-                      is-inovked #(let [m (<!! ch)]
-                                    (close! ch)
-                                    m)]
-
-                  (fact "callback should invoked upon tick"
-                        (subscribe-queue rabbit-uri stub/qname callback) => true
-                        (stub/send-tick) => true
-                        (is-inovked) => truthy
-                        )))))
+                    (subscribe-queue rabbit-uri "invalid.q")) => (throws RuntimeException #"Failed to subscribe queue")))
