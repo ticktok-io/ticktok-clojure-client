@@ -26,6 +26,7 @@
     (every? some? [chan conn])))
 
 (defn start-rabbit! [uri]
+  (println "not-running?" (not-running))
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
@@ -74,7 +75,6 @@
    (start-rabbit! uri)
    {:uri uri}
    "Failed to connect queue server"))
-
 
 (defn subscribe [uri qname callback]
   (try-connect uri)
