@@ -1,4 +1,4 @@
-(ns ticktok.fetch-test
+(ns ticktok.fetcher-test
   (:require [clojure.test :refer :all]
             [ticktok.fetcher :refer [fetch-clock]]
             [ticktok.stub-ticktok :as stub]
