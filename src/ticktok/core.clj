@@ -4,12 +4,10 @@
             [ticktok.fetcher :refer [fetch-clock]]
             [ticktok.utils :refer [fail-with pretty validate-input]]))
 
-(defn subscribe [clock clock-req]
-  (let [q (get-in clock [:channel :queue])
-        uri (get-in clock [:channel :uri])
-        callback (:callback clock-req)]
-    (rabbit/subscribe uri q callback)
-    nil))
+(defn subscribe [{:keys [channel]} {:keys [callback]}]
+  (rabbit/subscribe (:uri channel) (:queue channel) callback)
+  nil)
+
 
 (defn make-clock [config]
   (fn [clock-request]
