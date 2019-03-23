@@ -15,12 +15,12 @@
    (subscribe uri qname #())
    true))
 
-(facts :f "about subscribing to queue"
+(facts "about subscribing to queue"
        (facts "when failed to subscribe"
 
               (fact "should fail for connection error"
                     (subscribe-queue invalid-uri)) => (throws RuntimeException #"Failed to connect queue server")
 
-              (comment               (fact "should fail if queue wasn't found"
-                                           (subscribe-queue rabbit-uri "invalid.q")))
-              ))
+
+              (fact "should fail if queue wasn't found"
+                    (subscribe-queue rabbit-uri "invalid.q")) => (throws RuntimeException #"Failed to subscribe queue")))

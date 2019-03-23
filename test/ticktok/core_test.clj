@@ -61,7 +61,7 @@
    ((make-ticktok conf) req)))
 
 
-(facts "about ticktok"
+(facts :f "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
