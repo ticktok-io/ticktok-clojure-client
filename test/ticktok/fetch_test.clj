@@ -5,7 +5,6 @@
             [midje.sweet :refer :all]
             [ticktok.domain :as dom]))
 
-
 (def host  "http://localhost:8080")
 
 (def state (atom {:stub-ticktok nil}))

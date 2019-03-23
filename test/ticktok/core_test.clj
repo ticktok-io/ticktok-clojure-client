@@ -16,7 +16,6 @@
 (defn stop-ticktok []
   (swap! state update :stub-ticktok stub/stop!))
 
-
 (defn stub-ticktok []
   (get @state :stub-ticktok))
 
@@ -61,7 +60,6 @@
    (let [ticktok (ticktok conf)]
      (ticktok req))))
 
-
 (facts :f "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
@@ -94,9 +92,11 @@
                           ))))))
 
 (facts "about clock validity"
+
        (tabular
         (fact "should fail for invalid clock request"
               (register-clock ?host ?clock)) => (throws RuntimeException #"Invalid input")
+
         ?host ?clock
         host {:name "my.clock"}
         host {:name "my.clock" :schedule "Every.3.seconds"}
