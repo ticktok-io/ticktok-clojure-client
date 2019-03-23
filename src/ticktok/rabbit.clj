@@ -26,7 +26,6 @@
     (every? some? [chan conn])))
 
 (defn start-rabbit! [uri]
-  (println "not-running?" (not-running))
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
