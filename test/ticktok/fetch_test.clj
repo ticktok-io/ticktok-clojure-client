@@ -44,13 +44,11 @@
 (defn clock-from [clock-req]
   (select-keys clock-req [:name :schedule]))
 
-(defn fetch
-  ([]
-   (fetch {:name "my.clock"
-           :schedule "every.5.seconds"}))
-  ([clock-req]
-   (let [clock-req (dom/conform-clock-request clock-req)]
-     (fetch-clock host clock-req))))
+(defn fetch []
+  (let [clock-req {:name "my.clock"
+                    :schedule "every.5.seconds"}
+         clock-req (dom/conform-clock-request clock-req)]
+    (fetch-clock host clock-req)))
 
 (facts :f "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
