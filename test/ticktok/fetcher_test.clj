@@ -61,14 +61,4 @@
                           (fetch) => (contains {:channel (contains
                                                           {:queue string?
                                                            :uri string?})
-
-
-
-
-
-
-
-
-
-
                                                 :name (:name clock)}))))))
