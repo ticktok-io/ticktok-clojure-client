@@ -77,7 +77,5 @@
 
 
 (defn subscribe [uri qname callback]
-  (println "------- trying connect to" uri)
   (try-connect uri)
-  (println "------- connected with " uri)
   (try-subscribe qname callback))
