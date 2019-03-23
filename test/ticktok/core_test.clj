@@ -83,7 +83,6 @@
                 (with-state-changes [(before :facts (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
                   (let [ch (chan 1)
                         clock-request (make-clock-request #(put! ch "got tick"))
-                        clock (stub/make-clock-from clock-request)
                         is-inovked #(let [m (<!! ch)]
                                       (close! ch)
                                       m)]
