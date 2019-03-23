@@ -69,7 +69,6 @@
    {:queue qname}
    "Failed to subscribe queue"))
 
-
 (defn try-connect [uri]
   (try-or-fail
    (start-rabbit! uri)
@@ -78,6 +77,7 @@
 
 
 (defn subscribe [uri qname callback]
+  (println "------- trying connect to" uri)
   (try-connect uri)
   (println "------- connected with " uri)
   (try-subscribe qname callback))
