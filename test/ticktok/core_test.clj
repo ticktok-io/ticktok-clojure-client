@@ -95,7 +95,7 @@
 
 (facts "about clock validity"
        (tabular
-        (fact "should return fail for invalid clock request"
+        (fact "should fail for invalid clock request"
               (register-clock ?host ?clock)) => (throws RuntimeException #"Invalid input")
         ?host ?clock
         host {:name "my.clock"}
