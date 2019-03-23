@@ -1,12 +1,10 @@
 (ns ticktok.core-test
   (:require [clojure.test :refer :all]
-            [clojure.string :as string]
-            [ticktok.core :refer :all]
+            [ticktok.core :refer [ticktok]]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
-            [ticktok.domain :as dom]
-            [midje.sweet :refer :all]))
+            [ticktok.domain :as dom]))
 
 (def host  "http://localhost:8080")
 

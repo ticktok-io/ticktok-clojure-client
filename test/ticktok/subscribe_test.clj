@@ -1,6 +1,5 @@
 (ns ticktok.subscribe-test
   (:require [clojure.test :refer :all]
-            [clojure.string :as string]
             [ticktok.rabbit :refer [subscribe]]
             [midje.sweet :refer :all]))
 
