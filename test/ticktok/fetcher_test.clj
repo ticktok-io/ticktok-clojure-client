@@ -23,11 +23,6 @@
 (defn stub-respond-with [resp]
   (stub/respond-with (stub-ticktok) resp))
 
-(defn stub-ticktok-returned-bad-request []
-  (println "stub-ticktok-returned-bad-request")
-  (stub-respond-with {:status 400})
-  true)
-
 (defn stub-ticktok-respond-with-invalid-clock []
   (println "stub-ticktok-respond-with-invalid-clock")
   (stub-respond-with (stub/make-clock-from {}))
@@ -55,10 +50,6 @@
                             (after :contents (stop-ticktok))]
          (facts "when failed to fetch clock"
 
-                (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
-                  (fact "should fail if ticktok server retuned bad request"
-                        (fetch)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400)))
-
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
                   (fact "should fail if ticktok server respond with invalid clock"
                         (fetch)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock))))
@@ -70,4 +61,14 @@
                           (fetch) => (contains {:channel (contains
                                                           {:queue string?
                                                            :uri string?})
+
+
+
+
+
+
+
+
+
+
                                                 :name (:name clock)}))))))
