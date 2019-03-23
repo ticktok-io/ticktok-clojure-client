@@ -40,6 +40,6 @@
       (subscribe clock parsed-request)
       true)))
 
-(defn make-ticktok [config]
+(defn ticktok [config]
   (let [parsed-config (validate-input ::dom/config config)]
     (make-clock parsed-config)))

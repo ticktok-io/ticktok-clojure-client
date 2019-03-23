@@ -58,7 +58,8 @@
   ([req]
    (register-clock config req))
   ([conf req]
-   ((make-ticktok conf) req)))
+   (let [ticktok (ticktok conf)]
+     (ticktok req))))
 
 
 (facts :f "about ticktok"
