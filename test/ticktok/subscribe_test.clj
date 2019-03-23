@@ -6,7 +6,7 @@
 
 (def rabbit-uri "amqp://guest:guest@localhost:5672")
 
-(def invalid-uri "amqp://guest:guest@localhost:5672/someHost")
+(def invalid-uri "amqp://guest:nonguest@localhost:5672/nonhost")
 
 (defn subscribe-queue
   ([uri]
