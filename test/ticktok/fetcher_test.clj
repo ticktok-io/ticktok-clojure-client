@@ -48,6 +48,7 @@
 (facts :f "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
+
          (facts "when failed to fetch clock"
 
                 (with-state-changes [(before :contents (stub-ticktok-respond-with-invalid-clock))]
