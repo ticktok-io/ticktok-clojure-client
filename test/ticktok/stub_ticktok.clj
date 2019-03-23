@@ -106,7 +106,6 @@
   (swap! server assoc :instance nil :request nil :response nil)
   nil)
 
-
 (defn stop! [server]
   (let [inst (get @server :instance)]
     (when-not (nil? inst)

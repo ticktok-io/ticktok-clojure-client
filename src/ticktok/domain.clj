@@ -39,9 +39,6 @@
 (defn conform-clock [clock]
   (s/conform ::clock clock))
 
-(defn conform-config [config]
-  (s/conform ::config config))
-
 (defn conform-clock-request [clock-req]
   (s/conform ::clock-request clock-req))
 

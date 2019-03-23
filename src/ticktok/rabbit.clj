@@ -25,9 +25,9 @@
   (let [[chan conn] (rmq-chan-conn)]
     (every? some? [chan conn])))
 
-(defn start-rabbit! []
+(defn start-rabbit! [uri]
   (when (not-running)
-    (let [conn  (rmq/connect)
+    (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
       (swap! rabbit assoc :conn conn :chan ch)
       (println "rabbit prod started")))
@@ -44,20 +44,39 @@
       (println "rabbit prod stopped")))
   true)
 
-(defn exception-handler [e qname]
-  (let [exp (Throwable->map e)]
+(defn exception-handler [e details msg]
+  (let [exp (Throwable->map e)
+        explain (merge details {:error (:cause exp)})]
     (stop-rabbit!)
-    (fail-with "Failed to subscribe queue" {:queue qname
-                                            :error (:cause exp)})))
+    (fail-with msg explain)))
 
-(defn subscribe [qname callback]
-  (let [handler (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
-                  (let [msg (String. payload "UTF-8")
-                        r (callback)]
-                    (println (format "[consumer] received %s, returned %s" msg r))
-                    r))]
-    (try
-      (do
-        (start-rabbit!)
-        (lc/subscribe (rmq-chan) qname handler {:auto-ack true}))
-      (catch Exception e (exception-handler e qname)))))
+(defn wrap [callback]
+  (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
+    (let [msg (String. payload "UTF-8")
+          r (callback)]
+      (println (format "[consumer] received %s, returned %s" msg r))
+      r)))
+
+(defmacro try-or-fail [action req msg]
+  `(try
+     ~action
+     (catch Exception e#
+       (exception-handler e# ~req ~msg))))
+
+(defn try-subscribe [qname callback]
+  (try-or-fail
+   (lc/subscribe (rmq-chan) qname (wrap callback) {:auto-ack true})
+   {:queue qname}
+   "Failed to subscribe queue"))
+
+
+(defn try-connect [uri]
+  (try-or-fail
+   (start-rabbit! uri)
+   {:uri uri}
+   "Failed to connect queue server"))
+
+
+(defn subscribe [uri qname callback]
+  (try-connect uri)
+  (try-subscribe qname callback))

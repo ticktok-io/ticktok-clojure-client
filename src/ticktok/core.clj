@@ -28,8 +28,9 @@
 
 (defn subscribe [clock clock-req]
   (let [q (get-in clock [:channel :queue])
+        uri (get-in clock [:channel :uri])
         callback (:callback clock-req)]
-    (rabbit/subscribe q callback)
+    (rabbit/subscribe uri q callback)
     nil))
 
 (defn make-clock [config]
