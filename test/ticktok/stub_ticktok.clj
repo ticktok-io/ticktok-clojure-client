@@ -85,10 +85,6 @@
 (defn clock-handler [req]
   (let [res (@server :response)]
     (put! (@server :request) req)
-    ;(println "stub ticktok got")
-    ;(pretty (:body req))
-    ;(println "and respond with")
-;    (pretty res)
     res))
 
 (defroutes api-routes
@@ -150,7 +146,6 @@
 
 (defn respond-with [server res]
   (swap! server assoc :response res)
-  ;(println "stub will response with " (@server :response))
   nil)
 
 (defn incoming-request [server]
