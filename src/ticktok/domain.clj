@@ -55,6 +55,5 @@
 (defmethod conform ::config [{:keys [entity]}]
   (s/conform ::config entity))
 
-
 (defn invalid-input [type input]
   (throw (ex-info "Invalid input" (s/explain-data type input))))

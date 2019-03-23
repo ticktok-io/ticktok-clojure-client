@@ -5,7 +5,8 @@
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
-            [ticktok.domain :as dom]))
+            [ticktok.domain :as dom]
+            [midje.sweet :refer :all]))
 
 (def host  "http://localhost:8080")
 
@@ -16,6 +17,7 @@
 
 (defn stop-ticktok []
   (swap! state update :stub-ticktok stub/stop!))
+
 
 (defn stub-ticktok []
   (get @state :stub-ticktok))
