@@ -25,7 +25,7 @@
 
 (def qname "clock.ct")
 
-(def rabbit-host "http://localhost:15672")
+(def rabbit-uri "amqp://guest:guest@localhost:5672")
 
 (defn rmq-chan []
   (:chan @rabbit))
@@ -46,7 +46,7 @@
 
 (defn start-rabbit! []
   (when (not-running)
-    (let [conn  (rmq/connect)
+    (let [conn  (rmq/connect {:uri rabbit-uri})
           ch    (lch/open conn)]
       (swap! rabbit assoc :conn conn :chan ch)
       (println "rabbit stub started")))
@@ -140,7 +140,7 @@
    (make-clock-from clock-req qname))
   ([clock-req qname]
    (let [body {:channel {:queue qname
-                        :uri rabbit-host}
+                        :uri rabbit-uri}
               :name (:name clock-req)
               :schedule (:schedule clock-req)
               :id "my.id"

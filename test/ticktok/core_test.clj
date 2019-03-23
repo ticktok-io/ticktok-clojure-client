@@ -2,10 +2,8 @@
   (:require [clojure.test :refer :all]
             [clojure.string :as string]
             [ticktok.core :refer :all]
-            [ticktok.utils :refer [pretty]]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
-            [clojure.data.json :as json]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
             [ticktok.domain :as dom]))
 
@@ -63,39 +61,42 @@
    ((make-ticktok conf) req)))
 
 
-(facts "when ticktok failed to fetch clock"
+(facts "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts "when ticktok server failed to respond"
-                (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
+         (facts "when ticktok failed to fetch clock"
 
-                  (fact "should fail if ticktok server not found"
-                        (register-clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
+                (facts "when ticktok server failed to respond"
+                       (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
+
+                         (fact "should fail if ticktok server not found"
+                               (register-clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
+
+                         (fact "should ask from ticktok server clock"
+                               (stub-ticktok-incoming-request) => (contains {:name (:name clock-request)
+                                                                             :schedule (:schedule clock-request)})))))
+
+       (facts "when clock is successfully sent"
+
+                (with-state-changes [(before :facts (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
+                  (let [ch (chan 1)
+                        clock-request (make-clock-request #(put! ch "got tick"))
+                        clock (stub/make-clock-from clock-request)
+                        is-inovked #(let [m (<!! ch)]
+                                      (close! ch)
+                                      m)]
+
+                    (fact "should invoke callback upon tick"
+                          (register-clock clock-request) => true
+                          (stub/send-tick) => true
+                          (is-inovked) => truthy
+                          )))))
+
+       )
 
 
-                  (fact "should ask from ticktok server clock"
-                        (stub-ticktok-incoming-request) => (contains {:name (:name clock-request)
-                                                                      :schedule (:schedule clock-request)}))))))
 
-
-(facts "when clock is successfully sent"
-       (with-state-changes [(before :contents (start-ticktok))
-                            (after :contents (stop-ticktok))]
-
-         (with-state-changes [(before :facts(stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
-           (let [ch (chan 1)
-                 clock-request (make-clock-request #(put! ch "got tick"))
-                 clock (stub/make-clock-from clock-request)
-                 is-inovked #(let [m (<!! ch)]
-                               (close! ch)
-                               m)]
-
-             (fact "should invoke callback upon tick"
-                   (register-clock clock-request) => true
-                   (stub/send-tick) => true
-                   (is-inovked) => truthy
-                   )))))
 
 (facts "about clock validity"
        (tabular

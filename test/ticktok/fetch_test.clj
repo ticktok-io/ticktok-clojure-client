@@ -56,7 +56,7 @@
    (let [clock-req (dom/conform-clock-request clock-req)]
      (fetch-clock host clock-req))))
 
-(facts "about fetching a clock"
+(facts :f "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
          (facts :f "when failed to fetch clock"

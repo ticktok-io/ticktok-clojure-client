@@ -2,12 +2,7 @@
   (:require [clojure.test :refer :all]
             [clojure.string :as string]
             [ticktok.rabbit :refer [subscribe]]
-            [ticktok.utils :refer [pretty]]
-            [ticktok.stub-ticktok :as stub]
-            [midje.sweet :refer :all]
-            [clojure.data.json :as json]
-            [clojure.core.async :as async :refer [chan put! <!! close!]]
-            [ticktok.domain :as dom]))
+            [midje.sweet :refer :all]))
 
 (def rabbit-uri "amqp://guest:guest@localhost:5672")
 
@@ -17,10 +12,10 @@
   ([uri]
    (subscribe-queue uri ""))
   ([uri qname]
-   (subscribe-queue uri qname #())
+   (subscribe uri qname #())
    true))
 
-(facts "about subscribing to queue"
+(facts :f "about subscribing to queue"
        (facts "when failed to subscribe"
 
               (fact "should fail for connection error"
