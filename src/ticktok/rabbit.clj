@@ -56,6 +56,7 @@
     (let [msg (String. payload "UTF-8")
           r (callback)]
       (println (format "[consumer] received %s, returned %s" msg r))
+      (stop-rabbit!)
       r)))
 
 (defmacro try-or-fail [action req msg]

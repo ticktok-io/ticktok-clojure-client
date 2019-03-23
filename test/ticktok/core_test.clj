@@ -64,11 +64,11 @@
      (ticktok req))))
 
 
-(facts :f "about ticktok"
+(facts "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts "when ticktok failed to fetch clock"
+         (facts :f "when ticktok failed to fetch clock"
 
                 (facts "when ticktok server failed to respond"
                        (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
@@ -101,7 +101,7 @@
 
 
 
-(facts "about clock validity"
+(facts :f "about clock validity"
        (tabular
         (fact "should return fail for invalid clock request"
               (register-clock ?host ?clock)) => (throws RuntimeException #"")
