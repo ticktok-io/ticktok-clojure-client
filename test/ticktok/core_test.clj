@@ -81,14 +81,14 @@
                 (with-state-changes [(before :facts (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
                   (let [ch (chan 1)
                         clock-request (make-clock-request #(put! ch "got tick"))
-                        is-inovked #(let [m (<!! ch)]
+                        invoked? #(let [m (<!! ch)]
                                       (close! ch)
                                       m)]
 
                     (fact "should invoke callback upon tick"
                           (register-clock clock-request) => true
                           (stub/send-tick) => true
-                          (is-inovked) => truthy
+                          (invoked?) => truthy
                           ))))))
 
 (facts "about clock validity"
