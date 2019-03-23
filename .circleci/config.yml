@@ -19,7 +19,7 @@ jobs: # basic units of work in a run
           key: ticktok-{{ checksum "project.clj" }}
       - run:
          name: Testing
-         command: lein midje
+         command: lein midje :filter -f
       - run:
          name: Deploy
          command: .circleci/deploy.sh
