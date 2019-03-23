@@ -19,7 +19,7 @@
    (throw (ex-info msg details))))
 
 (defn validate-input [type entity]
-  (let [parsed (dom/conform {:type type :entity entity})]
+  (let [parsed (dom/conform type entity)]
     (if (= ::s/invalid parsed)
       (dom/invalid-input type entity)
       parsed)))

@@ -11,7 +11,7 @@
 
 (defn parse-clock [raw]
   (let [cl-map (json/read-str raw :key-fn keyword)
-        clock (dom/conform-clock cl-map)]
+        clock (dom/conform ::dom/clock cl-map)]
     (if (= ::s/invalid clock)
       (fail-with  "Failed to parse clock" {:clock raw})
       clock)))
