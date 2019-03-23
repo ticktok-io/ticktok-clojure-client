@@ -16,9 +16,10 @@
       (fail-with  "Failed to parse clock" {:clock raw})
       clock)))
 
-(defn fetch-clock [host clock-req]
+(defn fetch-clock [host {:keys [name schedule] :as clock-req}]
   (let [options {:headers  {"Content-Type" "application/json"}
-                 :body (json/write-str (select-keys clock-req [:name :schedule]))}
+                 :body (json/write-str {:name name
+                                        :schedule schedule})}
         endpoint (string/join [host api])
         {:keys [status body error]} @(http/post endpoint
                                                 options)]
