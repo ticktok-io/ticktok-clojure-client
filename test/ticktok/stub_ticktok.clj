@@ -134,11 +134,11 @@
 (defn make-clock-from
   ([clock-req]
    (make-clock-from clock-req qname))
-  ([clock-req qname]
+  ([{:keys [name schedule]} qname]
    (let [body {:channel {:queue qname
                         :uri rabbit-uri}
-              :name (:name clock-req)
-              :schedule (:schedule clock-req)
+              :name name
+              :schedule schedule
               :id "my.id"
               :url "my.url"}]
     {:status 201
