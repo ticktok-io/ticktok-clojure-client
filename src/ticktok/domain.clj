@@ -47,3 +47,9 @@
 
 (defn invalid-input [type input]
   (throw (ex-info "Invalid input" (s/explain-data type input))))
+
+(defn validate-input [type entity]
+  (let [parsed (conform type entity)]
+    (if (= ::s/invalid parsed)
+      (invalid-input type entity)
+      parsed)))
