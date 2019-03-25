@@ -36,9 +36,6 @@
   (stub-respond-with (stub/make-clock-from clock-request))
   true)
 
-(defn clock-from [clock-req]
-  (select-keys clock-req [:name :schedule]))
-
 (defn fetch []
   (fetch-clock host clock-request))
 
