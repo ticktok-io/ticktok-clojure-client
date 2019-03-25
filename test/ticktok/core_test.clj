@@ -46,10 +46,9 @@
   true)
 
 (defn stub-ticktok-respond-with-clock-and-schedule-ticks [clock]
-  (do
-    (stub-respond-with clock)
-    (stub/schedule-ticks)
-    true))
+  (stub-respond-with clock)
+  (stub/schedule-ticks)
+    true)
 
 (defn register-clock
   ([]

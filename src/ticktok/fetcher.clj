@@ -9,7 +9,7 @@
 
 (def api "/api/v1/clocks")
 
-(defn parse-clock [raw]
+(defn- parse-clock [raw]
   (let [cl-map (json/read-str raw :key-fn keyword)
         clock (dom/conform ::dom/clock cl-map)]
     (if (= ::s/invalid clock)

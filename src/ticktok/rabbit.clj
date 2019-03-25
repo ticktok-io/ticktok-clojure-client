@@ -8,24 +8,24 @@
 
 (defonce rabbit (atom {:chan nil :conn nil}))
 
-(defn rmq-chan []
+(defn- rmq-chan []
   (:chan @rabbit))
 
-(defn rmq-conn []
+(defn- rmq-conn []
   (:conn @rabbit))
 
-(defn rmq-chan-conn []
+(defn- rmq-chan-conn []
   [(rmq-chan), (rmq-conn)])
 
-(defn not-running []
+(defn- not-running []
   (let [[chan conn] (rmq-chan-conn)]
     (every? nil? [chan conn])))
 
-(defn running []
+(defn- running []
   (let [[chan conn] (rmq-chan-conn)]
     (every? some? [chan conn])))
 
-(defn start-rabbit! [uri]
+(defn- start-rabbit! [uri]
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
@@ -33,7 +33,7 @@
       (println "rabbit prod started")))
   true)
 
-(defn stop-rabbit! []
+(defn- stop-rabbit! []
   (when (running)
     (let [[chan conn] (rmq-chan-conn)
           closer #(when (rmq/open? %)
@@ -44,13 +44,13 @@
       (println "rabbit prod stopped")))
   true)
 
-(defn exception-handler [e details msg]
+(defn- exception-handler [e details msg]
   (let [exp (Throwable->map e)
         explain (merge details {:error (:cause exp)})]
     (stop-rabbit!)
     (fail-with msg explain)))
 
-(defn wrap [callback]
+(defn- wrap [callback]
   (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
     (let [msg (String. payload "UTF-8")
           r (callback)]
@@ -64,13 +64,13 @@
      (catch Exception e#
        (exception-handler e# ~req ~msg))))
 
-(defn try-subscribe [qname callback]
+(defn- try-subscribe [qname callback]
   (try-or-fail
    (lc/subscribe (rmq-chan) qname (wrap callback) {:auto-ack true})
    {:queue qname}
    "Failed to subscribe queue"))
 
-(defn try-connect [uri]
+(defn- try-connect [uri]
   (try-or-fail
    (start-rabbit! uri)
    {:uri uri}
