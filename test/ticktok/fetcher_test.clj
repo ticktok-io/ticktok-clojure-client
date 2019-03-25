@@ -28,9 +28,6 @@
   (stub-respond-with (stub/make-clock-from {}))
   true)
 
-(defn stub-ticktok-incoming-request []
-  (:body (stub/incoming-request (stub-ticktok))))
-
 (defn stub-ticktok-respond-with-clock []
   (println "stub-ticktok-respond-with-clock")
   (stub-respond-with (stub/make-clock-from clock-request))
