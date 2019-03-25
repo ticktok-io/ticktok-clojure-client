@@ -9,7 +9,7 @@
 
 (def state (atom {:stub-ticktok nil}))
 
-(def clock {:name "my.clock" :schedule "every.5.seconds"})
+(def clock-request {:name "my.clock" :schedule "every.5.seconds"})
 
 (defn start-ticktok []
   (swap! state assoc :stub-ticktok (stub/start!)))
@@ -33,17 +33,14 @@
 
 (defn stub-ticktok-respond-with-clock []
   (println "stub-ticktok-respond-with-clock")
-  (stub-respond-with (stub/make-clock-from clock))
+  (stub-respond-with (stub/make-clock-from clock-request))
   true)
 
 (defn clock-from [clock-req]
   (select-keys clock-req [:name :schedule]))
 
 (defn fetch []
-  (let [clock-req {:name "my.clock"
-                    :schedule "every.5.seconds"}
-         clock-req (dom/conform-clock-request clock-req)]
-    (fetch-clock host clock-req)))
+  (fetch-clock host clock-request))
 
 (facts :f "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
@@ -62,4 +59,4 @@
                           (fetch) => (contains {:channel (contains
                                                           {:queue string?
                                                            :uri string?})
-                                                :name (:name clock)}))))))
+                                                :name (:name clock-request)}))))))
