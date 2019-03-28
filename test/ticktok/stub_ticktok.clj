@@ -18,6 +18,7 @@
 (defonce server (atom {:instance nil
                        :request nil
                        :response nil}))
+
 (defonce rabbit (atom {:conn nil
                        :chan nil}))
 
@@ -67,8 +68,7 @@
     (closer chan)
     (println "stub rabbit: channel closed")
     (closer conn)
-    (println "stub rabbit: connection closed")
-    )
+    (println "stub rabbit: connection closed"))
   nil)
 
 (defn stop-rabbit! []
@@ -108,8 +108,8 @@
       (inst :timeout 100)
       (stop-server!)
       (stop-rabbit!)
-      (println "stub ticktok stopped")
-      nil)))
+      (println "stub ticktok stopped")))
+  nil)
 
 (defn start! []
   (start-server!)
@@ -128,8 +128,8 @@
     (lq/declare ch qname {:exclusive false :auto-delete true})
     (println "queue " qname " created")
     (lq/bind ch qname exchange-name)
-    (println "queue " qname " is bound to " exchange-name)
-    nil))
+    (println "queue " qname " is bound to " exchange-name))
+  nil)
 
 (defn make-clock-from
   ([clock-req]
