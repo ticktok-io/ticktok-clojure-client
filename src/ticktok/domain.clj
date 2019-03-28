@@ -36,6 +36,9 @@
 
 (s/def ::config (s/keys :req-un [::host ::token]))
 
+(defn valid? [type entity]
+  (s/valid? type entity))
+
 (defn conform [type entity]
   (s/conform type entity))
 
