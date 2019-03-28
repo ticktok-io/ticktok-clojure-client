@@ -25,7 +25,7 @@
   (let [[chan conn] (rmq-chan-conn)]
     (every? some? [chan conn])))
 
-(defn- start! [uri]
+(defn start! [uri]
   (println "start! " (not-running))
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
