@@ -8,13 +8,6 @@
   (rabbit/subscribe (:uri channel) (:queue channel) callback)
   nil)
 
-(defn- make-clock [config]
-  (fn [clock-request]
-    (let [parsed-request (dom/validate-input ::dom/clock-request clock-request)
-          clock (fetch-clock (:host config) parsed-request)]
-      (subscribe clock parsed-request)
-      true)))
-
 (declare ticktok)
 
 (defn dispatch-fn [config]
@@ -30,14 +23,13 @@
   (let [parsed-config (dom/validate-input ::dom/config config)]
     (dispatch-fn parsed-config)))
 
-
-(defmethod ticktok :stop [_]
-  (rabbit/stop!)
-  nil)
-
 (defmethod ticktok :schedule [_ config clock-request]
   (let [parsed-config (dom/validate-input ::dom/config config)
         parsed-request (dom/validate-input ::dom/clock-request clock-request)
         clock (fetch-clock (:host parsed-config) parsed-request)]
     (subscribe clock parsed-request)
     (dispatch-fn parsed-config)))
+
+(defmethod ticktok :stop [_]
+  (rabbit/stop!)
+  nil)
