@@ -89,16 +89,3 @@
                           (stub/send-tick) => true
                           (invoked?) => truthy
                           ))))))
-
-(facts "about clock validity"
-
-       (tabular
-        (fact "should fail for invalid clock request"
-              (register-clock ?host ?clock)) => (throws RuntimeException #"Invalid input")
-
-        ?host ?clock
-        host {:name "my.clock"}
-        host {:name "my.clock" :schedule "Every.3.seconds"}
-        host {:name "my.clock" :schedule "every.0.seconds"}
-        "" {:name "my.clock" :schedule "every.3.seconds"}
-        ))
