@@ -1,6 +1,6 @@
 (ns ticktok.subscribe-test
   (:require [clojure.test :refer :all]
-            [ticktok.rabbit :refer [subscribe start! stop!]]
+            [ticktok.rabbit :refer [subscribe stop!]]
             [midje.sweet :refer :all]))
 
 (def rabbit-uri "amqp://guest:guest@localhost:5672")

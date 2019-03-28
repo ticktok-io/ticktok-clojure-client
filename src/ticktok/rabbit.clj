@@ -27,24 +27,22 @@
 
 (defn start! [uri]
   (println "start! " (not-running))
-  (when true
-    (let [conn  (rmq/connect {:uri uri})
-          ch    (lch/open conn)]
-      (swap! rabbit assoc :conn conn :chan ch)
-      (println "rabbit prod started")))
-  true)
+  (let [conn  (rmq/connect {:uri uri})
+        ch    (lch/open conn)]
+    (swap! rabbit assoc :conn conn :chan ch)
+    (println "rabbit prod started"))
+  nil)
 
 (defn stop! []
   (println "stop! " (running))
-  (when true
-    (let [[chan conn] (rmq-chan-conn)
-          closer #(when (and (some? %) (rmq/open? %))
-                    (rmq/close %))]
-      (closer chan)
-      (closer conn)
-      (swap! rabbit assoc :conn nil :chan nil)
-      (println "rabbit prod stopped")))
-  true)
+  (let [[chan conn] (rmq-chan-conn)
+        closer #(when (and (some? %) (rmq/open? %))
+                  (rmq/close %))]
+    (closer chan)
+    (closer conn)
+    (swap! rabbit assoc :conn nil :chan nil)
+    (println "rabbit prod stopped"))
+  nil)
 
 (defn- exception-handler [e details msg]
   (let [exp (Throwable->map e)
