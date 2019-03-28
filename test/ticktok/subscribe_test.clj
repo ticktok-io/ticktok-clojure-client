@@ -14,7 +14,6 @@
    (subscribe uri qname #())
    true))
 
-
 (facts :f "about subscribing to queue"
 
        (facts "when failed to subscribe"
