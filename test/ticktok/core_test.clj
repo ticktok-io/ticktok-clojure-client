@@ -75,7 +75,7 @@
                                (ticktok-incoming-request) => (contains {:name (:name clock-request)
                                                                              :schedule (:schedule clock-request)})))))
 
-       (facts :f "when clock is successfully sent"
+         (facts :f "when clock is successfully sent"
 
                 (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))]
                   (let [ch (chan 1)
