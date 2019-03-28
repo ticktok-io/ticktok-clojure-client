@@ -25,7 +25,7 @@
   (let [[chan conn] (rmq-chan-conn)]
     (every? some? [chan conn])))
 
-(defn- start-rabbit! [uri]
+(defn- start! [uri]
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
@@ -33,7 +33,7 @@
       (println "rabbit prod started")))
   true)
 
-(defn- stop-rabbit! []
+(defn stop! []
   (when (running)
     (let [[chan conn] (rmq-chan-conn)
           closer #(when (rmq/open? %)
@@ -47,7 +47,7 @@
 (defn- exception-handler [e details msg]
   (let [exp (Throwable->map e)
         explain (merge details {:error (:cause exp)})]
-    (stop-rabbit!)
+    (stop!)
     (fail-with msg explain)))
 
 (defn- wrap [callback]
@@ -55,7 +55,6 @@
     (let [msg (String. payload "UTF-8")
           r (callback)]
       (println (format "[consumer] received %s, returned %s" msg r))
-      (stop-rabbit!) ;;SHOULD NOR BE HERED - client need to close the connection
       r)))
 
 (defmacro try-or-fail [action req msg]
@@ -72,7 +71,7 @@
 
 (defn- try-connect [uri]
   (try-or-fail
-   (start-rabbit! uri)
+   (start! uri)
    {:uri uri}
    "Failed to connect queue server"))
 

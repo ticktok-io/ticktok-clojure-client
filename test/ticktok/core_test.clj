@@ -1,6 +1,6 @@
 (ns ticktok.core-test
   (:require [clojure.test :refer :all]
-            [ticktok.core :refer [ticktok]]
+            [ticktok.core :as tk]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
@@ -56,8 +56,8 @@
   ([req]
    (register-clock config req))
   ([conf req]
-   (let [ticktok (ticktok conf)]
-     (ticktok req))))
+   (tk/ticktok :schedule conf req)
+   true))
 
 (facts :f "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
