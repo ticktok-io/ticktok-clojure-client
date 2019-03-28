@@ -68,7 +68,7 @@
                 (facts "when ticktok server failed to respond"
                        (with-state-changes [(before :contents (ticktok-returned-bad-request))]
 
-                         (fact "should fail if ticktok server not found"
+                         (fact "should fail if ticktok server returned bad request"
                                (register-clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
 
                          (fact "should ask from ticktok server clock"
