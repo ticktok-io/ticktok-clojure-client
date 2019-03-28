@@ -37,15 +37,15 @@
 
 (def config {:host host :token "my.token"})
 
-(defn stub-ticktok-incoming-request []
+(defn ticktok-incoming-request []
   (:body (stub/incoming-request (stub-ticktok))))
 
-(defn stub-ticktok-returned-bad-request []
+(defn ticktok-returned-bad-request []
   (println "stub-ticktok-returned-bad-request")
   (stub-respond-with {:status 400})
   true)
 
-(defn stub-ticktok-respond-with-clock-and-schedule-ticks [clock]
+(defn ticktok-scheduled-ticks-and-respond-with [clock]
   (stub-respond-with clock)
   (stub/schedule-ticks)
     true)
@@ -66,18 +66,18 @@
          (facts :f "when ticktok failed to fetch clock"
 
                 (facts "when ticktok server failed to respond"
-                       (with-state-changes [(before :contents (stub-ticktok-returned-bad-request))]
+                       (with-state-changes [(before :contents (ticktok-returned-bad-request))]
 
                          (fact "should fail if ticktok server not found"
                                (register-clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
 
                          (fact "should ask from ticktok server clock"
-                               (stub-ticktok-incoming-request) => (contains {:name (:name clock-request)
+                               (ticktok-incoming-request) => (contains {:name (:name clock-request)
                                                                              :schedule (:schedule clock-request)})))))
 
        (facts :f "when clock is successfully sent"
 
-                (with-state-changes [(before :facts (stub-ticktok-respond-with-clock-and-schedule-ticks clock))]
+                (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))]
                   (let [ch (chan 1)
                         clock-request (make-clock-request #(put! ch "got tick"))
                         invoked? #(let [m (<!! ch)]
