@@ -26,6 +26,7 @@
     (every? some? [chan conn])))
 
 (defn- start! [uri]
+  (println "start! " (not-running))
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
@@ -34,6 +35,7 @@
   true)
 
 (defn stop! []
+  (println "stop! " (running))
   (when (running)
     (let [[chan conn] (rmq-chan-conn)
           closer #(when (rmq/open? %)
