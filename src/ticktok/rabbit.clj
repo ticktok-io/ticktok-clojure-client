@@ -36,7 +36,7 @@
 (defn stop! []
   (when (running)
     (let [[chan conn] (rmq-chan-conn)
-          closer #(when (and (some? %) (rmq/open? %))
+          closer #(when (rmq/open? %)
                     (rmq/close %))]
       (closer chan)
       (closer conn)
