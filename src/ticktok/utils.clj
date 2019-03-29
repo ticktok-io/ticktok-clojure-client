@@ -19,14 +19,14 @@
 
 (defmacro fail-with-inner-ex [e]
   `(let [src-ex# (:e (ex-data ~e))
-         src-ex# (Throwable->map src-ex#)
+         src-ex#      (Throwable->map src-ex#)
          src-ex# (first (:via src-ex#)) ]
      (fail-with (:message src-ex#) (:data src-ex#))))
 
 (defmacro retry [f attempts]
   `(try
-    (p/retry {:strategy (p/constant-retry-strategy ~default-delay ~attempts)}
-      (p/retriable {:catch [RuntimeException]}
-        ~f))
+     (p/retry {:strategy (p/constant-retry-strategy ~default-delay ~attempts)}
+       (p/retriable {:catch [RuntimeException]}
+         ~f))
     (catch Exception e#
       (fail-with-inner-ex e#))))
