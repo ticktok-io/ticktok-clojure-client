@@ -6,7 +6,8 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [http-kit "2.2.0"]
                  [org.clojure/data.json "0.2.6"]
-                 [com.novemberain/langohr "5.0.0"]]
+                 [com.novemberain/langohr "5.0.0"]
+                 [com.grammarly/perseverance "0.1.3"]]
   :jvm-opts ~(let [version     (System/getProperty "java.version")
                    [major _ _] (clojure.string/split version #"\.")]
                (if (>= (java.lang.Integer/parseInt major) 9)

@@ -12,7 +12,10 @@
        (str "caught exception: " (.getMessage e#)))))
 
 (defn fail-with
-  ([msg]
-   (fail-with msg {}))
+  ([e]
+   (let [src-ex (:e (ex-data e))
+         src-ex (Throwable->map src-ex)
+         {:keys [message data]} (first (:via src-ex))]
+   (fail-with message data)))
   ([msg details]
    (throw (ex-info msg details))))

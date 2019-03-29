@@ -17,7 +17,8 @@
 
 (defonce server (atom {:instance nil
                        :request nil
-                       :response nil}))
+                       :response nil
+                       :retry 0}))
 
 (defonce rabbit (atom {:conn nil
                        :chan nil}))
@@ -82,10 +83,20 @@
       (println "rabbit stub stopped")))
   true)
 
+(defn should-repond? []
+  (let [retry (@server :retry)]
+    (if (zero? retry)
+      true
+      (do
+        (swap! server update-in [:retry] dec)
+        false))))
+
 (defn clock-handler [req]
-  (let [res (@server :response)]
-    (put! (@server :request) req)
-    res))
+  (if (should-repond?)
+    (let [res (@server :response)]
+      (put! (@server :request) req)
+      res)
+    {:status 404}))
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
@@ -95,11 +106,11 @@
       (middleware/wrap-json-body {:keywords? true})))
 
 (defn start-server! []
-  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1))
+  (swap! server assoc :instance (http/run-server #'app {:port 8080}) :request (chan 1) :retry  0)
   nil)
 
 (defn stop-server! []
-  (swap! server assoc :instance nil :request nil :response nil)
+  (swap! server assoc :instance nil :request nil :response nil :retry nil)
   nil)
 
 (defn stop! [server]
@@ -115,6 +126,7 @@
   (start-server!)
   (println "stub ticktok started")
   server)
+
 
 (defn send-tick []
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
@@ -152,6 +164,11 @@
   (let [c (@server :request)
         req (<!! c)]
     req))
+
+
+(defn fail-for [server n]
+  (swap! server assoc :retry n)
+  nil)
 
 (defn schedule-ticks []
   (do

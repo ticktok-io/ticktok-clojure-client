@@ -7,6 +7,8 @@
 
 (def host  "http://localhost:8080")
 
+(def attempts 3)
+
 (def state (atom {:stub-ticktok nil}))
 
 (def clock-request {:name "my.clock" :schedule "every.5.seconds"})
@@ -33,14 +35,22 @@
   (stub-respond-with (stub/make-clock-from clock-request))
   true)
 
-(defn fetch []
-  (fetch-clock host clock-request))
+(defn ticktok-finally-respond-with-clock [attempts]
+  (stub/fail-for (stub-ticktok) attempts)
+  (ticktok-respond-with-clock)
+  true)
 
-(facts :f "about fetching a clock"
+(defn fetch
+  ([]
+   (fetch 0))
+  ([n]
+   (fetch-clock host clock-request n)))
+
+(facts "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts "when failed to fetch clock"
+         (facts :f "when failed to fetch clock"
 
                 (with-state-changes [(before :contents (ticktok-respond-with-invalid-clock))]
                   (fact "should fail if ticktok server respond with invalid clock"
@@ -49,8 +59,12 @@
          (facts "when ticktok respond with valid clock"
 
                 (with-state-changes [(before :contents (ticktok-respond-with-clock))]
-                  (fact "should return clock details"
+                  (fact :f "should return clock details"
                           (fetch) => (contains {:channel (contains
                                                           {:queue string?
                                                            :uri string?})
-                                                :name (:name clock-request)}))))))
+                                                :name (:name clock-request)})))
+
+                (with-state-changes [(before :contents (ticktok-finally-respond-with-clock attempts))]
+                  (fact "should return clock details after retry"
+                        (fetch attempts) => truthy)))))
