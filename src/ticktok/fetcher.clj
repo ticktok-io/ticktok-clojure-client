@@ -5,14 +5,11 @@
             [ticktok.domain :as dom]
             [clojure.spec.alpha :as s]
             [ticktok.rabbit :as rabbit]
-            [ticktok.utils :refer [fail-with]]
-            [perseverance.core :as p]))
+            [ticktok.utils :refer [fail-with retry]]))
 
 (def api "/api/v1/clocks")
 
 (def default-attempts 4)
-
-(def default-delay 100)
 
 (defn- parse-clock [raw]
   (let [cl-map (json/read-str raw :key-fn keyword)
@@ -33,22 +30,10 @@
                                             :request clock-req})
        body)))
 
-(defn- safe-fetch [host clock-req]
-  (p/retriable {:catch [RuntimeException]}
-    (fetch host clock-req)))
-
-
-(defn try-fetch [host clock-req attempts]
-  (try
-    (p/retry {:strategy (p/constant-retry-strategy default-delay attempts)}
-      (safe-fetch host clock-req))
-    (catch Exception e
-      (fail-with e))))
-
 (defn fetch-clock
   ([host clock-req]
    (fetch-clock host clock-req default-attempts))
   ([host clock-req attempts]
-   (let [clock (try-fetch host clock-req attempts)
+   (let [clock (retry (fetch host clock-req) attempts)
          clock (parse-clock clock)]
      clock)))
