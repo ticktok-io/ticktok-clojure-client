@@ -10,11 +10,9 @@
 
 (declare ticktok)
 
-(defn dispatch-fn [config]
+(defn- dispatch-fn [config]
   (fn [command & args]
-    (if (some? args)
-      (ticktok command config (first args))
-      (ticktok command config))))
+    (ticktok command config (first args))))
 
 (defmulti ticktok (fn [op & _]
                     op))
