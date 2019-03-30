@@ -33,14 +33,13 @@
   nil)
 
 (defn stop! []
-  (when (running)
-    (let [[chan conn] (rmq-chan-conn)
-          closer #(when (rmq/open? %)
-                    (rmq/close %))]
-      (closer chan)
-      (closer conn)
-      (swap! rabbit assoc :conn nil :chan nil)
-  nil)))
+  (let [[chan conn] (rmq-chan-conn)
+        closer #(when (and (some? %) (rmq/open? %))
+                  (rmq/close %))]
+    (closer chan)
+    (closer conn)
+    (swap! rabbit assoc :conn nil :chan nil)
+    nil))
 
 (defn- exception-handler [e details msg]
   (let [exp (Throwable->map e)
