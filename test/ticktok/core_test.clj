@@ -77,7 +77,8 @@
 
          (facts :f "when clock is successfully sent"
 
-                (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))]
+                (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))
+                                     (after :facts (tk/ticktok :stop))]
                   (let [ch (chan 1)
                         clock-request (make-clock-request #(put! ch "got tick"))
                         invoked? #(let [m (<!! ch)]
