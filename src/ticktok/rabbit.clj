@@ -29,8 +29,7 @@
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
           ch    (lch/open conn)]
-      (swap! rabbit assoc :conn conn :chan ch)
-      (println "rabbit prod started")))
+      (swap! rabbit assoc :conn conn :chan ch)))
   nil)
 
 (defn stop! []
@@ -41,8 +40,7 @@
       (closer chan)
       (closer conn)
       (swap! rabbit assoc :conn nil :chan nil)
-      (println "rabbit prod stopped")))
-  nil)
+  nil)))
 
 (defn- exception-handler [e details msg]
   (let [exp (Throwable->map e)
@@ -54,7 +52,6 @@
   (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
     (let [msg (String. payload "UTF-8")
           r (callback)]
-      (println (format "[consumer] received %s, returned %s" msg r))
       r)))
 
 (defmacro try-or-fail [action req msg]

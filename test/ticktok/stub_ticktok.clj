@@ -6,7 +6,7 @@
             [ring.middleware.json :as middleware]
             [clojure.data.json :as json]
             [org.httpkit.server :as http]
-            [clojure.core.async :as async :refer [chan put! <!!]]
+            [clojure.core.async :as async :refer [chan put! <!! close!]]
             [langohr.core      :as rmq]
             [langohr.channel   :as lch]
             [langohr.queue     :as lq]
@@ -110,6 +110,7 @@
   nil)
 
 (defn stop-server! []
+  (swap! server update-in [:request] close!)
   (swap! server assoc :instance nil :request nil :response nil :retry nil)
   nil)
 
