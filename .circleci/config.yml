@@ -4,6 +4,7 @@ jobs: # basic units of work in a run
     working_directory: ~/temp # directory where steps will run
     docker: # run the steps with Docker
       - image: circleci/clojure:lein-2.8.1 # ...with this image as the primary container; this is where all `steps` will run
+      - image: rabbitmq:3.7
     environment: # environment variables for primary container
       LEIN_ROOT: nbd
       JVM_OPTS: -Xmx3200m # limit the maximum heap size to prevent out of memory errors

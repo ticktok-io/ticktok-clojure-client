@@ -1,0 +1,39 @@
+(ns ticktok.fetcher
+  (:require [org.httpkit.client :as http]
+            [clojure.data.json :as json]
+            [clojure.string :as string]
+            [ticktok.domain :as dom]
+            [clojure.spec.alpha :as s]
+            [ticktok.rabbit :as rabbit]
+            [ticktok.utils :refer [fail-with retry]]))
+
+(def api "/api/v1/clocks")
+
+(def default-attempts 4)
+
+(defn- parse-clock [raw]
+  (let [cl-map (json/read-str raw :key-fn keyword)
+        clock (dom/conform ::dom/clock cl-map)]
+    (if (= ::s/invalid clock)
+      (fail-with  "Failed to parse clock" {:clock raw})
+      clock)))
+
+(defn- fetch [host {:keys [name schedule] :as clock-req}]
+  (let [options {:headers  {"Content-Type" "application/json"}
+                  :body (json/write-str {:name name
+                                         :schedule schedule})}
+         endpoint (string/join [host api])
+         {:keys [status body error]} @(http/post endpoint
+                                                 options)]
+     (if (not= status 201)
+       (fail-with  "Failed to fetch clock" {:status status
+                                            :request clock-req})
+       body)))
+
+(defn fetch-clock
+  ([host clock-req]
+   (fetch-clock host clock-req default-attempts))
+  ([host clock-req attempts]
+   (let [clock (retry (fetch host clock-req) attempts)
+         clock (parse-clock clock)]
+     clock)))

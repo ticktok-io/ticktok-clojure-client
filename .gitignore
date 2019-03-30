@@ -3,4 +3,5 @@
 pom.xml
 .lein-failures
 .settings.xml
+.nrepl-port
 
