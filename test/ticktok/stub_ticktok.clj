@@ -128,7 +128,6 @@
   (println "stub ticktok started")
   server)
 
-
 (defn send-tick []
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
   true)
@@ -165,7 +164,6 @@
   (let [c (@server :request)
         req (<!! c)]
     req))
-
 
 (defn fail-for [server n]
   (swap! server assoc :retry n)
