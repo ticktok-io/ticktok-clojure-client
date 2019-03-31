@@ -59,11 +59,11 @@
    (tk/ticktok :schedule conf req)
    true))
 
-(facts :f "about ticktok"
+(facts  "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts :f "when ticktok failed to fetch clock"
+         (facts  "when ticktok failed to fetch clock"
 
                 (facts "when ticktok server failed to respond"
                        (with-state-changes [(before :contents (ticktok-returned-bad-request))]
@@ -75,7 +75,7 @@
                                (ticktok-incoming-request) => (contains {:name (:name clock-request)
                                                                              :schedule (:schedule clock-request)})))))
 
-         (facts :f "when clock is successfully sent"
+         (facts  "when clock is successfully sent"
 
                 (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))
                                      (after :facts (tk/ticktok :stop))]

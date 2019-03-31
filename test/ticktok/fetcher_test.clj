@@ -52,7 +52,7 @@
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts :f "when failed to fetch clock"
+         (facts  "when failed to fetch clock"
 
                 (with-state-changes [(before :contents (ticktok-respond-with-invalid-clock))]
                   (fact "should fail if ticktok server respond with invalid clock"
@@ -61,7 +61,7 @@
          (facts "when ticktok respond with valid clock"
 
                 (with-state-changes [(before :contents (ticktok-respond-with-clock))]
-                  (fact :f "should return clock details"
+                  (fact  "should return clock details"
                           (fetch) => (contains {:channel (contains
                                                           {:queue string?
                                                            :uri string?})
