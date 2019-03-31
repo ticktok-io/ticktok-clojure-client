@@ -7,6 +7,8 @@
 
 (def host  "http://localhost:8080")
 
+(def config {:host host :token "my.token"})
+
 (def attempts 3)
 
 (def state (atom {:stub-ticktok nil}))
@@ -44,7 +46,7 @@
   ([]
    (fetch 0))
   ([n]
-   (fetch-clock host clock-request n)))
+   (fetch-clock config clock-request n)))
 
 (facts "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
