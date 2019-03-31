@@ -100,7 +100,7 @@
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
-           (POST "/" [] clock-handler)))
+           (POST "/" [access_token] clock-handler)))
 (def app
   (-> (handler/site api-routes)
       (middleware/wrap-json-body {:keywords? true})))

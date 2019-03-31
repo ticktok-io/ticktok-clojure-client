@@ -24,7 +24,7 @@
 (defmethod ticktok :schedule [_ config clock-request]
   (let [parsed-config (dom/validate-input ::dom/config config)
         parsed-request (dom/validate-input ::dom/clock-request clock-request)
-        clock (fetch-clock (:host parsed-config) parsed-request)]
+        clock (fetch-clock parsed-config parsed-request)]
     (subscribe clock parsed-request)
     (dispatch-fn parsed-config)))
 
