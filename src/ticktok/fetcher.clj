@@ -9,7 +9,7 @@
 
 (def api "/api/v1/clocks")
 
-(def default-attempts 4)
+(def default-attempts 6)
 
 (defn- parse-clock [raw]
   (let [cl-map (json/read-str raw :key-fn keyword)
