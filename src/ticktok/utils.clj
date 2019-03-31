@@ -3,7 +3,9 @@
             [ticktok.domain :as dom]
             [perseverance.core :as p]))
 
-(def default-delay 100)
+(def retry-defaults {:max-delay 10000
+                     :initial-delay 2000
+                     :max-count 4})
 
 (defn pretty [obj]
   (pp/pprint obj))
@@ -25,7 +27,10 @@
 
 (defmacro retry [f attempts]
   `(try
-     (p/retry {:strategy (p/constant-retry-strategy ~default-delay ~attempts)}
+     (p/retry {:strategy (p/progressive-retry-strategy
+                          :max-count (:max-count retry-defaults)
+                          :initial-delay (:initial-delay retry-defaults)
+                          :max-delay (:max-delay retry-defaults))}
        (p/retriable {:catch [RuntimeException]}
          ~f))
     (catch Exception e#
