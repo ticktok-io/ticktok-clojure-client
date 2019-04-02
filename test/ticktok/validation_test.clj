@@ -17,7 +17,6 @@
 
         ?host ?clock
         valid-host {:name "my.clock"}
-        valid-host {:name "my.clock" :schedule "Every.3.seconds"}
-        valid-host {:name "my.clock" :schedule "every.0.seconds"}
+        valid-host {:name "my.clock" :schedule ""}
         "" {:name "my.clock" :schedule "every.3.seconds"}
         ))
