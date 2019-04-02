@@ -1,6 +1,7 @@
 (ns ticktok.domain
   (:require [clojure.string :as string]
-            [clojure.spec.alpha :as s]))
+            [clojure.spec.alpha :as s]
+            [ticktok.utils :refer [fail-with]]))
 
 
 
@@ -47,11 +48,8 @@
 (defn conform-clock-request [clock-req]
   (conform ::clock-request clock-req))
 
-(defn invalid-input [type input]
-  (throw (ex-info "Invalid input" (s/explain-data type input))))
-
 (defn validate-input [type entity]
   (let [parsed (conform type entity)]
     (if (= ::s/invalid parsed)
-      (invalid-input type entity)
+      (fail-with "Invalid input" (s/explain-data type input))
       parsed)))
