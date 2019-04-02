@@ -1,6 +1,5 @@
 (ns ticktok.utils
   (:require [clojure.pprint :as pp]
-            [ticktok.domain :as dom]
             [perseverance.core :as p]))
 
 (def retry-defaults {:max-delay 10000
