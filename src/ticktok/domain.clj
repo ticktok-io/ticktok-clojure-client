@@ -2,10 +2,9 @@
   (:require [clojure.string :as string]
             [clojure.spec.alpha :as s]))
 
-(def schedule-regex #"every.[1-9].\w+")
 
-(s/def ::schedule-type
-  (s/and string? #(re-matches schedule-regex %)))
+
+(s/def ::schedule-type string?)
 
 (s/def ::name string?)
 
