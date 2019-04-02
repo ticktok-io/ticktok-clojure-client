@@ -51,5 +51,5 @@
 (defn validate-input [type entity]
   (let [parsed (conform type entity)]
     (if (= ::s/invalid parsed)
-      (fail-with "Invalid input" (s/explain-data type input))
+      (fail-with "Invalid input" (s/explain-data type entity))
       parsed)))
