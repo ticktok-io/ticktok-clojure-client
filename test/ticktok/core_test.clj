@@ -56,8 +56,9 @@
   ([req]
    (register-clock config req))
   ([conf req]
-   (tk/ticktok :schedule conf req)
-   true))
+   (let [ticktok (tk/ticktok :start conf)]
+     (ticktok :schedule req)
+     true)))
 
 (facts  "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))

@@ -13,7 +13,7 @@ Latest release via [Leiningen](https://leiningen.org/):
 
 ### Examples
 ### Register an action for a clock
-Ticktok assumes default configuration when not provided, as documents in [Ticktok docs](https://ticktok.io/docs).
+Ticktok assumes default configuration when not provided, as documented in [Ticktok docs](https://ticktok.io/docs).
 ```clojure
 
 (require '[ticktok.core :as tk])
