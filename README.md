@@ -27,13 +27,15 @@ Ticktok assumes default configuration when not provided, as documented in [Tickt
                     :schedule "every.3.seconds"
                     :callback #(println "First clockgot a tick!")})
 
-(ticktok :schedule {:name "ease.in"
-                    :schedule "every.1.hour"
-                    :callback #(println "Second clock got a tick!")})
+(tk/ticktok :schedule config {:name "ease.in"
+                              :schedule "every.1.hours"
+                              :callback #(println "Second clock got a tick!")})
 
 (ticktok :stop)
 
 ```
+
+In the example above we registred two clocks in two supported ways: the first one is by calling ```(ticktok :start config)``` which returns us a function the waits to schedule clocks. In the second way, we call directly to ```(ticktok :schedule)``` with both the clock and the desired configuration.
 
 ## Community
 Have some questions/ideas? chat with us on [Slack](https://join.slack.com/t/ticktokio/shared_invite/enQtNTE0MzExNTY5MjIzLThjNDU3NjIzYzQxZTY0YTM5ODE2OWFmMWU3YmQ1ZTViNDVmYjZkNWUzMWU5NWU0YmU5NWYxMWMxZjlmNGQ1Y2U)
