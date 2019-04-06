@@ -19,7 +19,7 @@ Ticktok assumes default configuration when not provided, as documented in [Tickt
 (require '[ticktok.core :as tk])
 
 (def config {:host "http://localhost:8080"
-                     :token "ticktok-zY3wpR"})
+             :token "ticktok-zY3wpR"})
 
 (def ticktok (tk/ticktok :start config))
 
