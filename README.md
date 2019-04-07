@@ -46,5 +46,7 @@ Ticktok assumes default configuration when not provided, as documented in [Tickt
 
 In the example above we registred two clocks in different supported ways: the first one is by calling ```(ticktok :start config)``` which returns us a function the waits to schedule clocks associated to the given ```config```. For the second clock, we call directly to ```(ticktok :schedule config clock)``` with both the clock and the desired configuration. Behind the scenes, both ways are effectively the same.
 
+To stop listening to new ticks, call ticktok with ```:stop```.
+
 ## Community
 Have some questions/ideas? chat with us on [Slack](https://join.slack.com/t/ticktokio/shared_invite/enQtNTE0MzExNTY5MjIzLThjNDU3NjIzYzQxZTY0YTM5ODE2OWFmMWU3YmQ1ZTViNDVmYjZkNWUzMWU5NWU0YmU5NWYxMWMxZjlmNGQ1Y2U)
