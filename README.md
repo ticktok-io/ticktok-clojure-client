@@ -1,4 +1,5 @@
 # Ticktok.io Clojure Client
+[![Clojars Project](https://img.shields.io/clojars/v/org.clojars.ticktok/ticktok.svg)](https://clojars.org/org.clojars.ticktok/ticktok)
 
 ## Description
 This is a Clojure client for [Ticktok.io](https://ticktok.io). It allows to easily creating new clocks and invoke actions on ticks.
@@ -8,12 +9,19 @@ This is a Clojure client for [Ticktok.io](https://ticktok.io). It allows to easi
 Ticktok artifacts are [published to Clojars](https://clojars.org/org.clojars.ticktok/ticktok).
 Latest release via [Leiningen](https://leiningen.org/):
 
-> [![Clojars Project](https://img.shields.io/clojars/v/org.clojars.ticktok/ticktok.svg)](https://clojars.org/org.clojars.ticktok/ticktok)
+```clojure
+ [org.clojars.ticktok/ticktok "0.1.0"]
+```
 
 
-### Examples
-### Register an action for a clock
+
+## Quick Start
+
 Ticktok assumes default configuration when not provided, as documented in [Ticktok docs](https://ticktok.io/docs).
+
+### Register an action for a clock
+
+
 ```clojure
 
 (require '[ticktok.core :as tk])
