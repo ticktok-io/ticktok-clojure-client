@@ -45,7 +45,7 @@ Ticktok assumes default configuration when not provided, as documented in [Tickt
 
 (ticktok :schedule {:name "hurry.up"
                     :schedule "every.3.seconds"
-                    :callback #(println "First clockgot a tick!")})
+                    :callback #(println "First clock got a tick!")})
 
 (tk/ticktok :schedule config {:name "ease.in"
                               :schedule "every.1.hours"
