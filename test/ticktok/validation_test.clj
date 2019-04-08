@@ -27,4 +27,4 @@
         )
 
        (fact "should fail for invalid command"
-             (tk/ticktok :unknow-command)) => (throws RuntimeException #"Unknown command"))
+             (tk/ticktok :unknown-command)) => (throws RuntimeException #"Unknown command"))
