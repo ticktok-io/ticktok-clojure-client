@@ -17,7 +17,6 @@
   (fn [command & args]
     (ticktok command config (first args))))
 
-
 (defmulti ticktok (fn [op & _]
                     op))
 
