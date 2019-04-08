@@ -21,7 +21,7 @@
 
         ?host ?clock
         valid-config {:name "my.clock"}
-        valid-config {:name "my.clock" :schedule ""}
+        valid-config {:schedule "every.3.seconds"}
         {:host "host"} valid-clock
         {:token "token"} valid-clock
         ))
