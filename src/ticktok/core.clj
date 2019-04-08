@@ -41,4 +41,5 @@
   (rabbit/stop!)
   nil)
 
-(defmethod ticktok :default [op] (fail-with "Unknown command" {:command op}))
+(defmethod ticktok :default [op]
+  (fail-with "Unknown command" {:command op}))
