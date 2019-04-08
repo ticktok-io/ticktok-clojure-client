@@ -28,9 +28,6 @@
    (let [parsed-config (dom/validate-input ::dom/config config)]
      (dispatch-fn parsed-config))))
 
-(defmethod ticktok :schedule [_ clock-request]
-  (ticktok :schedule default-config clock-request))
-
 (defmethod ticktok :schedule
   ([_ clock-request]
    (ticktok :schedule default-config clock-request))
