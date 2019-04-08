@@ -24,4 +24,7 @@
         valid-config {:schedule "every.3.seconds"}
         {:host "host"} valid-clock
         {:token "token"} valid-clock
-        ))
+        )
+
+       (fact "should fail for invalid command"
+             (tk/ticktok :unknown-command)) => (throws RuntimeException #"Unknown command"))
