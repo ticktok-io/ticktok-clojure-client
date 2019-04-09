@@ -4,7 +4,7 @@ set -e
 
 if [ "${CIRCLE_BRANCH}" == "release" ]; then
     echo going to deploy
-    lein deploy clojars
+    lein release
     echo deployed successfully
 else
     echo No publishing from $CIRCLE_BRANCH branch
