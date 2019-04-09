@@ -29,12 +29,16 @@
                    "leiningen.release/bump-version" "release"]
                   ["vcs" "commit"]
                   ["vcs" "tag" "--no-sign"]
-                  ["deploy clojars"]
+                  ["deploy"]
                   ["change" "version" "leiningen.release/bump-version"]
                   ["vcs" "commit"]
                   ["vcs" "push"]]
 
-  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
-                                    :sign-releases false
-                                    :username :env/clojars_username
-                                    :password :env/clojars_password}]])
+  :repositories [["releases" {:url "https://clojars.org/repo"
+                              :sign-releases false
+                              :username :env/clojars_username
+                              :password :env/clojars_password}]
+                 ["snapshots" {:url "https://clojars.org/repo"
+                               :sign-releases false
+                               :username :env/clojars_username
+                               :password :env/clojars_password}]])
