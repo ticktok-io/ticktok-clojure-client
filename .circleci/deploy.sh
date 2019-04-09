@@ -2,7 +2,7 @@
 
 set -e
 
-if [ "${CIRCLE_BRANCH}" == "release-temp" ]; then
+if [ "${CIRCLE_BRANCH}" == "release" ]; then
     echo going to deploy
     git config --global user.email "tal.vanish@gmail.com"
     git config --global user.name "wanishing"
