@@ -20,6 +20,26 @@ jobs: # basic units of work in a run
       - run:
          name: Testing
          command: lein midje
-      - run:
-         name: Deploy
-         command: .circleci/deploy.sh
+  deploy:
+    working_directory: ~/temp-deploy # directory where steps will run
+    docker: # run the steps with Docker
+      - image: circleci/clojure:lein-2.8.1
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints:
+            - "4a:58:08:49:38:6c:eb:b9:f1:b7:68:81:ad:5c:d2:bb"
+      - deploy:
+          command: .circleci/deploy.sh
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
+          filters:
+            branches:
+              only: release

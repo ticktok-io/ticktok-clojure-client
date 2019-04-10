@@ -79,7 +79,7 @@
          (facts  "when clock is successfully sent"
 
                 (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))
-                                     (after :facts (tk/ticktok :stop))]
+                                     (after :facts (tk/ticktok :close))]
                   (let [ch (chan 1)
                         callback #(put! ch "got tick")
                         clock-request (make-clock-request callback)

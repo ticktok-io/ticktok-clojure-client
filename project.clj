@@ -1,4 +1,4 @@
-(defproject ticktok/ticktok "0.1.0-SNAPSHOT"
+(defproject ticktok/ticktok "1.0.5-SNAPSHOT"
   :description "ticktok clojure client"
   :url "https://ticktok.io"
   :license {:name "Eclipse Public License"
@@ -34,7 +34,11 @@
                   ["vcs" "commit"]
                   ["vcs" "push"]]
 
-  :deploy-repositories [["clojars" {:url "https://clojars.org/repo"
-                                    :sign-releases false
-                                    :username :env/clojars_username
-                                    :password :env/clojars_password}]])
+  :repositories [["releases" {:url "https://clojars.org/repo"
+                              :sign-releases false
+                              :username :env/clojars_username
+                              :password :env/clojars_password}]
+                 ["snapshots" {:url "https://clojars.org/repo"
+                               :sign-releases false
+                               :username :env/clojars_username
+                               :password :env/clojars_password}]])
