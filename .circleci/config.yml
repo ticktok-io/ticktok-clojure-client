@@ -21,6 +21,8 @@ jobs: # basic units of work in a run
          name: Testing
          command: lein midje
   deploy:
+    docker: # run the steps with Docker
+      - image: circleci/clojure:lein-2.8.1
     steps:
       - add_ssh_keys:
           fingerprints:
