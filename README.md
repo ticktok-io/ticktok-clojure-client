@@ -1,6 +1,5 @@
 # Ticktok.io Clojure Client
-[![Clojars Project](https://img.shields.io/clojars/v/ticktok.svg)]
-(https://clojars.org/ticktok)
+[![Clojars Project](https://img.shields.io/clojars/v/ticktok.svg)](https://clojars.org/ticktok)
 
 
 ## Description
