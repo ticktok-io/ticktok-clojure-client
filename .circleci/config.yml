@@ -23,6 +23,5 @@ jobs: # basic units of work in a run
       - add_ssh_keys:
           fingerprints:
             - "4a:58:08:49:38:6c:eb:b9:f1:b7:68:81:ad:5c:d2:bb"
-      - run:
-         name: Deploy
+      - deploy:
          command: .circleci/deploy.sh
