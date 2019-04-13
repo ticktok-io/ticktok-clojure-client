@@ -2,7 +2,7 @@
 [![Clojars Project](https://img.shields.io/clojars/v/ticktok.svg)](https://clojars.org/ticktok)
 
 ## Description
-This is a Clojure client for [Ticktok.io](https://ticktok.io). It allows you to easily creating new clocks and invoke actions on ticks.
+This is the official Clojure client for [Ticktok.io](https://ticktok.io). It allows you to easily create new clocks and invoke actions on ticks.
 
 ## Installation
 
