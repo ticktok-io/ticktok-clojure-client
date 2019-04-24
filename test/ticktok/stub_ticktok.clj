@@ -54,12 +54,19 @@
       (println "rabbit stub started")))
   true)
 
-(defn clear-resources! []
+(defn delete-exchange [name]
   (let [ch (rmq-chan)]
-    (safe (lq/delete ch qname))
-    (println qname "deleted")
-    (safe (le/delete ch exchange-name))
-    (println exchange-name "deleted"))
+    (safe (le/delete ch name))))
+
+(defn delete-queue [name]
+  (let [ch (rmq-chan)]
+    (safe (lq/delete ch name))))
+
+(defn clear-resources! []
+  (delete-queue qname)
+  (println qname "deleted")
+  (delete-exchange exchange-name)
+  (println exchange-name "deleted")
   nil)
 
 (defn close-rabbit! []
