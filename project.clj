@@ -1,5 +1,5 @@
 (defproject ticktok/ticktok "1.0.5-SNAPSHOT"
-  :description "ticktok clojure client"
+  :description "DEPRECATED: ticktok clojure client"
   :url "https://ticktok.io"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
