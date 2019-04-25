@@ -29,7 +29,7 @@
   true)
 
 
-(facts "about subscribing to queue"
+(facts :f "about subscribing to queue"
 
        (facts "when successfully subscribed"
               (with-state-changes [(before :contents (do

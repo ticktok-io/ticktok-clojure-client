@@ -17,7 +17,13 @@
 
 (s/def ::uri string?)
 
-(s/def ::channel (s/keys :req-un [::queue ::uri]))
+(s/def ::url string?)
+
+(s/def ::details (s/keys :req-un [(or [::queue ::url] [::url])]))
+
+(s/def ::type (s/and string? #(contains? #{"rabbit" "http"} %)))
+
+(s/def ::channel (s/keys :req-un [::details ::type]))
 
 (s/fdef ::callback
         :args any?

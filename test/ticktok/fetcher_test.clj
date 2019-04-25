@@ -48,7 +48,7 @@
   ([n]
    (fetch-clock config clock-request n)))
 
-(facts "about fetching a clock"
+(facts :f "about fetching a clock"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
@@ -63,8 +63,8 @@
                 (with-state-changes [(before :contents (ticktok-respond-with-clock))]
                   (fact  "should return clock details"
                           (fetch) => (contains {:channel (contains
-                                                          {:queue string?
-                                                           :uri string?})
+                                                          {:details (contains {:queue string?
+                                                                               :uri string?})})
                                                 :name (:name clock-request)})))
 
                 (with-state-changes [(before :contents (ticktok-finally-respond-with-clock attempts))]

@@ -64,7 +64,7 @@
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts  "when ticktok failed to fetch clock"
+         (facts :f "when ticktok failed to fetch clock"
 
                 (facts "when ticktok server failed to respond"
                        (with-state-changes [(before :contents (ticktok-returned-bad-request))]

@@ -7,8 +7,12 @@
 (def default-config {:host "http://localhost:8080"
                      :token "ticktok-zY3wpR"})
 
-(defn- subscribe [{:keys [channel]} {:keys [callback]}]
-  (rabbit/subscribe (:uri channel) (:queue channel) callback)
+(defmulti subscribe (fn [{:keys [channel]} _]
+                       (keyword (:type channel))))
+
+(defmethod subscribe :rabbit [{:keys [channel]} {:keys [callback]}]
+  (let [details (:details channel)]
+    (rabbit/subscribe (:uri details) (:queue details) callback))
   nil)
 
 (declare ticktok)

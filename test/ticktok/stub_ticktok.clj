@@ -154,8 +154,9 @@
   ([clock-req]
    (make-clock-from clock-req qname))
   ([{:keys [name schedule]} qname]
-   (let [body {:channel {:queue qname
-                        :uri rabbit-uri}
+   (let [body {:channel {:details {:queue qname
+                                   :uri rabbit-uri}
+                         :type "rabbit"}
               :name name
               :schedule schedule
               :id "my.id"
