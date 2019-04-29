@@ -105,9 +105,13 @@
       res)
     {:status 404}))
 
+
 (defroutes api-routes
   (context "/api/v1/clocks" []
-           (POST "/" [access_token] clock-handler)))
+           (POST "/" [access_token] clock-handler))
+  (GET "/:clock-id/pop" [clock-id]
+       http-clock-handler))
+
 (def app
   (-> (handler/site api-routes)
       (middleware/wrap-json-body {:keywords? true})))

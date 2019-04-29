@@ -1,6 +1,7 @@
 (ns ticktok.core
   (:require [ticktok.domain :as dom]
             [ticktok.rabbit :as rabbit]
+            [ticktok.http :as http]
             [ticktok.fetcher :refer [fetch-clock]]
             [ticktok.utils :refer [fail-with pretty]]))
 
@@ -13,6 +14,11 @@
 (defmethod subscribe :rabbit [{:keys [channel]} {:keys [callback]}]
   (let [details (:details channel)]
     (rabbit/subscribe (:uri details) (:queue details) callback))
+  nil)
+
+(defmethod subscribe :http [{:keys [channel]} {:keys [callback]}]
+  (let [details (:details channel)]
+    (http/subscribe (:url details) callback))
   nil)
 
 (declare ticktok)

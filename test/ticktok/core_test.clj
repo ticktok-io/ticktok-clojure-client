@@ -60,6 +60,7 @@
      (ticktok :schedule req)
      true)))
 
+
 (facts  "about ticktok"
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
