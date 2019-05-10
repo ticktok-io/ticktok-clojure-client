@@ -12,16 +12,19 @@
 (defn- pool []
   (:pool @state))
 
+(defn- tasks []
+  (:tasks @state))
+
 (defn- start! []
   (when (nil? (pool))
     (swap! state assoc :pool (at/mk-pool))))
 
 (defn stop-task [t]
+  (println "stopping " t)
   (at/stop t))
 
 (defn stop-tasks []
-  (doseq [[c t] (:tasks @state)]
-    (println "stopping " c)
+  (doseq [[c t] (tasks)]
     (stop-task (:task t))))
 
 (defn shutdown-pool []
@@ -55,6 +58,8 @@
      :url url}))
 
 (defn- schedule-task [url clock callback]
+  (when-let [t (get (tasks) clock)]
+    (stop-task (:task  t)))
   (swap! state update :tasks assoc clock (make-task url callback)))
 
 (defn subscribe [url clock callback]

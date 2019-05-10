@@ -76,13 +76,18 @@
 
          (with-state-changes [(after :contents (http/stop!))]
 
-           (fact "should invoke callback upon tick"
+           (fact "should enable replace callback for given clock"
                  (let [ch (chan 1)
-                       callback #(put! ch "got tick")
-                       invoked? #(let [m (<!! ch)]
-                                   (close! ch)
-                                   m)]
-                   (subscribe "c3" callback) => true
-                   (push-tick "c3")
-                   (invoked?) => truthy
+                       cb1 #(put! ch "cb1")
+                       cb2 #(put! ch "cb2")
+                       invoked? (fn [cb]
+                                  (let [m (<!! ch)]
+                                    (= m cb)))]
+                   (subscribe "c3" cb1) => true
+                   (push-tick "c3") => true
+                   (invoked? "cb1") => true
+                   (subscribe "c3" cb2) => true
+                   (push-tick "c3") => true
+                   (invoked? "cb2") => true
+                   (invoked? "cb3") => false
                    )))))
