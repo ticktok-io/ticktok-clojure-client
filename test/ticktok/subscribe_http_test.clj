@@ -89,5 +89,5 @@
                    (subscribe "c3" cb2) => true
                    (push-tick "c3") => true
                    (invoked? "cb2") => true
-                   (invoked? "cb3") => false
+                   (invoked? "cb1") => false
                    )))))
