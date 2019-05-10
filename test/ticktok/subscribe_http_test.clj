@@ -40,7 +40,7 @@
   (Thread/sleep 3000)
   true)
 
-(defn push-ticks [& cs]
+(defn push-tick [& cs]
   (let [stub (stub-ticktok)]
     (doseq [c cs]
       (stub/push-tick stub c)))
@@ -71,7 +71,7 @@
                  (subscribe "c1" callback) => truthy
                  (subscribe "c2" callback) => truthy
                  (http/stop!) => truthy
-                 (push-ticks "c1" "c2") => true
+                 (push-tick "c1" "c2") => true
                  (not-invoked?) => true))
 
          (with-state-changes [(after :contents (http/stop!))]
@@ -83,6 +83,6 @@
                                    (close! ch)
                                    m)]
                    (subscribe "c3" callback) => true
-                   (push-ticks "c3")
+                   (push-tick "c3")
                    (invoked?) => truthy
                    )))))
