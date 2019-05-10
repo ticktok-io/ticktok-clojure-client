@@ -7,6 +7,7 @@
             [clojure.data.json :as json]
             [org.httpkit.server :as http]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
+            [clojure.string :as string]
             [langohr.core      :as rmq]
             [langohr.channel   :as lch]
             [langohr.queue     :as lq]
@@ -18,6 +19,8 @@
 (defonce server (atom {:instance nil
                        :request nil
                        :response nil
+                       :ticks #{}
+                       :incoming-clocks #{}
                        :retry 0}))
 
 (defonce rabbit (atom {:conn nil
@@ -28,6 +31,10 @@
 (def qname "clock.ct")
 
 (def rabbit-uri "amqp://guest:guest@localhost:5672")
+
+(def port 8080)
+
+(def host (format "http://localhost:%d" port))
 
 (defn rmq-chan []
   (:chan @rabbit))
@@ -98,6 +105,28 @@
         (swap! server update-in [:retry] dec)
         false))))
 
+(defn make-request
+  ([body]
+   (make-request body 201))
+  ([body status]
+   (let [resp {:status status
+               :body (json/write-str body)}]
+     (println "stub deb/:" resp)
+     resp)))
+
+(defn make-clock-from
+  ([clock-req]
+   (make-clock-from clock-req qname))
+  ([{:keys [name schedule]} qname]
+   (let [body {:channel {:details {:queue qname
+                                   :uri rabbit-uri}
+                         :type "rabbit"}
+               :name name
+               :schedule schedule
+               :id "my.id"
+               :url "my.url"}]
+     (make-request body))))
+
 (defn clock-handler [req]
   (if (should-repond?)
     (let [res (@server :response)]
@@ -105,12 +134,21 @@
       res)
     {:status 404}))
 
+(defn http-clock-handler [clock-id]
+  (println "popped for " clock-id)
+  (swap! server update :incoming-clocks conj clock-id)
+  (fn [req]
+    (if (contains? (:ticks @server) clock-id)
+      (do
+        (swap! server update :incoming-clocks disj clock-id)
+        (make-request [{:tick clock-id}] 200))
+      (make-request nil 400))))
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
            (POST "/" [access_token] clock-handler))
   (GET "/:clock-id/pop" [clock-id]
-       http-clock-handler))
+       (http-clock-handler clock-id)))
 
 (def app
   (-> (handler/site api-routes)
@@ -122,7 +160,7 @@
 
 (defn stop-server! []
   (swap! server update-in [:request] close!)
-  (swap! server assoc :instance nil :request nil :response nil :retry nil)
+  (swap! server assoc :instance nil :request nil :response nil :retry nil :ticks #{} :incoming-clocks #{})
   nil)
 
 (defn stop! [server]
@@ -143,6 +181,11 @@
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
   true)
 
+(defn push-tick [server cl]
+  (swap! server update :ticks conj cl)
+  true)
+
+
 (defn bind-queue [qname]
   (println "bind " qname)
   (let [ch (rmq-chan)]
@@ -154,20 +197,6 @@
     (println "queue " qname " is bound to " exchange-name))
   nil)
 
-(defn make-clock-from
-  ([clock-req]
-   (make-clock-from clock-req qname))
-  ([{:keys [name schedule]} qname]
-   (let [body {:channel {:details {:queue qname
-                                   :uri rabbit-uri}
-                         :type "rabbit"}
-              :name name
-              :schedule schedule
-              :id "my.id"
-              :url "my.url"}]
-    {:status 201
-     :body (json/write-str body)})))
-
 (defn respond-with [server res]
   (swap! server assoc :response res)
   nil)
@@ -176,6 +205,11 @@
   (let [c (@server :request)
         req (<!! c)]
     req))
+
+(defn popped? [server clock]
+  (println "incoming clocks " (:incoming-clocks @server))
+  (contains? (:incoming-clocks @server) clock))
+
 
 (defn fail-for [server n]
   (swap! server assoc :retry n)
