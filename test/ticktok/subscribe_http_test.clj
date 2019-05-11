@@ -64,7 +64,7 @@
 
          (with-state-changes [(after :contents (http/stop!))]
 
-           (fact "should enable replace callback for given clock"
+           (fact "should replace callback for given clock"
                  (let [ch (chan 1)
                        cb1 #(put! ch "cb1")
                        cb2 #(put! ch "cb2")
