@@ -43,25 +43,24 @@
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (fact :f "should not invoke callback failed to fetch ticks"
-               (let [counter (atom 0)
-                     not-invoked? #(zero? @counter)
-                     callback #(swap! counter inc)]
-                 (subscribe "c0" callback) => truthy
-                 (wait-a-bit) => true
-                 (popped? "c0") => true
-                 (not-invoked?) => true
-                 ))
+         (let [counter (atom 0)
+               not-invoked? #(zero? @counter)
+               callback #(swap! counter inc)]
 
-         (fact :f "should stop subscribing for all consumers"
-               (let [counter (atom 0)
-                     not-invoked? #(zero? @counter)
-                     callback #(swap! counter inc)]
-                 (subscribe "c1" callback) => truthy
-                 (subscribe "c2" callback) => truthy
-                 (http/stop!) => truthy
-                 (push-tick "c1" "c2") => true
-                 (not-invoked?) => true))
+           (with-state-changes [(after :contents (reset! counter 0))]
+
+             (fact "should not invoke callback failed to fetch ticks"
+                   (subscribe "c0" callback) => truthy
+                   (wait-a-bit) => true
+                   (popped? "c0") => true
+                   (not-invoked?) => true)
+
+             (fact "should stop subscribing for all consumers"
+                   (subscribe "c1" callback) => truthy
+                   (subscribe "c2" callback) => truthy
+                   (http/stop!) => truthy
+                   (push-tick "c1" "c2") => true
+                   (not-invoked?) => true)))
 
          (with-state-changes [(after :contents (http/stop!))]
 
