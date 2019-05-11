@@ -105,9 +105,9 @@
         (swap! server update-in [:retry] dec)
         false))))
 
-(defn make-request
+(defn make-response
   ([body]
-   (make-request body 201))
+   (make-response body 201))
   ([body status]
    (let [resp {:status status
                :body (json/write-str body)}]
@@ -124,7 +124,7 @@
                :schedule schedule
                :id "my.id"
                :url "my.url"}]
-     (make-request body))))
+     (make-response body))))
 
 (defn clock-handler [req]
   (if (should-repond?)
@@ -140,9 +140,8 @@
     (if (contains? (:ticks @server) clock-id)
       (do
         (swap! server update :ticks disj clock-id)
-        (make-request [{:tick clock-id}] 200))
-      (make-request nil 400))))
-
+        (make-response [{:tick clock-id}] 200))
+      (make-response nil 400))))
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
@@ -185,9 +184,7 @@
   (swap! server update :ticks conj cl)
   true)
 
-
 (defn bind-queue [qname]
-  (println "bind " qname)
   (let [ch (rmq-chan)]
     (le/declare ch exchange-name "fanout" {:durable false :auto-delete true})
     (println "exchange " exchange-name " created")
