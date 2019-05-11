@@ -14,6 +14,8 @@
 (defn- parse-clock [raw]
   (let [cl-map (json/read-str raw :key-fn keyword)
         clock (dom/conform ::dom/clock cl-map)]
+    (println "raw " cl-map)
+    (println "clock is " clock)
     (if (= ::s/invalid clock)
       (fail-with  "Failed to parse clock" {:clock raw})
       clock)))
@@ -26,7 +28,8 @@
          endpoint (string/join [host api])
          {:keys [status body error]} @(http/post endpoint
                                                  options)]
-     (if (not= status 201)
+    (println "ticktok: " body status error)
+    (if (not= status 201)
        (fail-with  "Failed to fetch clock" {:status status
                                             :request clock-req})
        body)))

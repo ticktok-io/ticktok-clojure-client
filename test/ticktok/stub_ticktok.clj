@@ -111,7 +111,6 @@
   ([body status]
    (let [resp {:status status
                :body (json/write-str body)}]
-     (println "stub deb/:" resp)
      resp)))
 
 (defn make-clock-from
@@ -140,9 +139,10 @@
   (fn [req]
     (if (contains? (:ticks @server) clock-id)
       (do
-        (swap! server update :incoming-clocks disj clock-id)
+        (swap! server update :ticks disj clock-id)
         (make-request [{:tick clock-id}] 200))
       (make-request nil 400))))
+
 
 (defroutes api-routes
   (context "/api/v1/clocks" []
@@ -207,9 +207,7 @@
     req))
 
 (defn popped? [server clock]
-  (println "incoming clocks " (:incoming-clocks @server))
   (contains? (:incoming-clocks @server) clock))
-
 
 (defn fail-for [server n]
   (swap! server assoc :retry n)

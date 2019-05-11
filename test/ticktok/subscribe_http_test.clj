@@ -7,14 +7,10 @@
 
 (def state (atom {:stub-ticktok nil}))
 
-(def clock-name "my.clock")
-
 (def host  "http://localhost:8080")
 
 (defn clock [name]
   (format "%s/%s/pop" host name))
-
-(def clock-url (clock clock-name))
 
 (defn start-ticktok []
   (swap! state assoc :stub-ticktok (stub/start!)))
@@ -29,10 +25,6 @@
   (http/subscribe (clock ck) ck callback)
   true)
 
-(defn ticktok-scheduled-ticks []
-  (start-ticktok)
-  (stub/respond-with (stub-ticktok) (stub/make-request [{:tick "1"}] 200)))
-
 (defn popped? [clock]
   (stub/popped? (stub-ticktok) clock))
 
@@ -46,9 +38,7 @@
       (stub/push-tick stub c)))
   true)
 
-
 (facts "about subscribing to clock on http mode"
-
 
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
@@ -56,11 +46,10 @@
          (fact :f "should not invoke callback failed to fetch ticks"
                (let [counter (atom 0)
                      not-invoked? #(zero? @counter)
-                     callback #(swap! counter inc)
-                     clock "c0"]
-                 (subscribe clock callback) => truthy
+                     callback #(swap! counter inc)]
+                 (subscribe "c0" callback) => truthy
                  (wait-a-bit) => true
-                 (popped? clock) => true
+                 (popped? "c0") => true
                  (not-invoked?) => true
                  ))
 
@@ -89,5 +78,6 @@
                    (subscribe "c3" cb2) => true
                    (push-tick "c3") => true
                    (invoked? "cb2") => true
+                   (push-tick "c3") => true
                    (invoked? "cb1") => false
                    )))))

@@ -15,53 +15,47 @@
 (defn- tasks []
   (:tasks @state))
 
-(defn- start! []
+(defn- init! []
   (when (nil? (pool))
     (swap! state assoc :pool (at/mk-pool))))
 
 (defn stop-task [t]
-  (println "stopping " t)
   (at/stop t))
 
 (defn stop-tasks []
   (doseq [[c t] (tasks)]
-    (stop-task (:task t))))
+    (stop-task (:task t)))
+  (swap! state assoc :tasks {}))
 
 (defn shutdown-pool []
   (when-let [pool (pool)]
-    (swap! state assoc :pool (do
+    (swap! state update :pool #(do
                                (at/stop-and-reset-pool! pool :strategy :kill)
-                               nil))))
-
+                               %))))
 (defn stop! []
   (stop-tasks)
   (shutdown-pool))
 
-(defn- ticks [endpoint]
-  (let [{:keys [status body error]} @(http/get endpoint {:as :text})
+(defn- ticks [clock-url]
+  (let [{:keys [status body error]} @(http/get clock-url {:as :text})
         parse #(json/read-str % :key-fn keyword)]
-    (println endpoint "fetch: " status body)
     (if (= status 200)
       (parse body)
       nil)))
 
-(defn invoke-on
-  [url callback]
-  (fn []
-    (when (seq (ticks url))
-      (callback))))
-
-(defn make-task [url callback]
-  (let [invoker (invoke-on url callback)
-        t (at/every default-rate invoker (pool))]
+(defn- run-task [url callback]
+  (let [invoke-on-tick (fn []
+                         (when (seq (ticks url))
+                           (callback)))
+        t (at/every default-rate invoke-on-tick (pool))]
     {:task t
      :url url}))
 
 (defn- schedule-task [url clock callback]
   (when-let [t (get (tasks) clock)]
     (stop-task (:task  t)))
-  (swap! state update :tasks assoc clock (make-task url callback)))
+  (swap! state update :tasks assoc clock (run-task url callback)))
 
 (defn subscribe [url clock callback]
-  (start!)
+  (init!)
   (schedule-task url clock callback))
