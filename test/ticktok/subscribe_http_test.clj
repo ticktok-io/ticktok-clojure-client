@@ -49,7 +49,7 @@
 
            (with-state-changes [(after :contents (reset! counter 0))]
 
-             (fact "should not invoke callback failed to fetch ticks"
+             (fact "should not invoke callback when failed to fetch ticks"
                    (subscribe "c0" callback) => truthy
                    (wait-a-bit) => true
                    (popped? "c0") => true
