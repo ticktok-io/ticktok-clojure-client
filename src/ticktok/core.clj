@@ -8,7 +8,6 @@
 (def default-config {:host "http://localhost:8080"
                      :token "ticktok-zY3wpR"})
 
-
 (defmulti subscribe (fn [{:keys [channel]} _]
                        (keyword (:type channel))))
 
@@ -52,7 +51,6 @@
   (rabbit/stop!)
   (http/stop!)
   nil)
-
 
 (defmethod ticktok :default [op]
   (fail-with "Unknown command" {:command op}))
