@@ -1,25 +1,13 @@
 (ns ticktok.core
   (:require [ticktok.domain :as dom]
+            [ticktok.subscriber :as subscriber]
+            [ticktok.fetcher :refer [fetch-clock]]
             [ticktok.rabbit :as rabbit]
             [ticktok.http :as http]
-            [ticktok.fetcher :refer [fetch-clock]]
             [ticktok.utils :refer [fail-with pretty]]))
 
 (def default-config {:host "http://localhost:8080"
                      :token "ticktok-zY3wpR"})
-
-(defmulti subscribe (fn [{:keys [channel]} _]
-                       (keyword (:type channel))))
-
-(defmethod subscribe :rabbit [{:keys [channel]} {:keys [callback]}]
-  (let [details (:details channel)]
-    (rabbit/subscribe (:uri details) (:queue details) callback))
-  nil)
-
-(defmethod subscribe :http [{:keys [channel id]} {:keys [callback]}]
-  (let [url (get-in channel [:details :url])]
-    (http/subscribe url id callback))
-  nil)
 
 (declare ticktok)
 
@@ -44,7 +32,7 @@
    (let [parsed-config (dom/validate-input ::dom/config config)
          parsed-request (dom/validate-input ::dom/clock-request clock-request)
          clock (fetch-clock parsed-config parsed-request)]
-     (subscribe clock parsed-request)
+     (subscriber/subscribe-clock clock parsed-request)
      (dispatch-fn parsed-config))))
 
 (defmethod ticktok :close [_]

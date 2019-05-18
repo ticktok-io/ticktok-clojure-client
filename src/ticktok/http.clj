@@ -44,17 +44,22 @@
       nil)))
 
 (defn- run-task [url callback]
-  (let [invoke-on-tick (fn []
+  (let [callback-ref (atom callback)
+        invoke-on-tick (fn []
                          (when (seq (ticks url))
-                           (callback)))
+                           (@callback-ref)))
         t (at/every default-rate invoke-on-tick (pool))]
     {:task t
-     :url url}))
+     :url url
+     :callback callback-ref}))
+
+(defn- swap-callback! [{:keys [callback]} new-callback]
+  (reset! callback  new-callback))
 
 (defn- schedule-task [url clock callback]
-  (when-let [t (get (tasks) clock)]
-    (stop-task (:task  t)))
-  (swap! state update :tasks assoc clock (run-task url callback)))
+  (if-let [t (get (tasks) clock)]
+    (swap-callback! t callback)
+    (swap! state update :tasks assoc clock (run-task url callback))))
 
 (defn subscribe [url clock callback]
   (init!)
