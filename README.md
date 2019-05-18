@@ -63,5 +63,23 @@ Behind the scenes, both ways are effectively the same.
 
 To stop listening for new ticks, call ticktok with `:close`.
 
+### Replace callback for given clock
+
+It's now (1.0.6+) possible to swap callback for a registered clock. When calling `(ticktok :schedule)` with the same clock but with new callback, ticktok swaps the consuming callback for the given clock.
+
+```clojure
+
+(require '[ticktok.core :as tk])
+
+(tk/ticktok :schedule {:name "hurry.up"
+                      :schedule "every.3.seconds"
+                      :callback #(println "First callback invoked!")})
+
+(tk/ticktok :schedule {:name "hurry.up"
+                      :schedule "every.3.seconds"
+                      :callback #(println "Second callback invoked!")})
+
+```
+
 ## Community
 Have some questions/ideas? chat with us on [Slack](https://join.slack.com/t/ticktokio/shared_invite/enQtNTE0MzExNTY5MjIzLThjNDU3NjIzYzQxZTY0YTM5ODE2OWFmMWU3YmQ1ZTViNDVmYjZkNWUzMWU5NWU0YmU5NWYxMWMxZjlmNGQ1Y2U)
