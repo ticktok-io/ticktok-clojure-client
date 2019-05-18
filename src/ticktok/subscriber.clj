@@ -27,6 +27,6 @@
   (let [url (get-in channel [:details :url])]
     (HttpClock. id url callback)))
 
-(defn subscribe-clock [cl clock-req]
-  (let [clock (clock cl clock-req)]
+(defn subscribe-clock [cl cl-req]
+  (let [clock (clock cl cl-req)]
     (subscribe clock)))
