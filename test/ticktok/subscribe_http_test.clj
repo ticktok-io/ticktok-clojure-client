@@ -38,7 +38,7 @@
       (stub/push-tick stub c)))
   true)
 
-(facts :f "about subscribing to clock on http mode"
+(facts "about subscribing to clock on http mode"
 
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]

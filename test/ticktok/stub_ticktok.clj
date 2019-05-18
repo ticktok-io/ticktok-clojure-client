@@ -1,20 +1,20 @@
 (ns ticktok.stub-ticktok
   (:require
-            [compojure.core :refer :all]
-            [compojure.handler :as handler]
-            [compojure.route :refer :all]
-            [ring.middleware.json :as middleware]
-            [clojure.data.json :as json]
-            [org.httpkit.server :as http]
-            [clojure.core.async :as async :refer [chan put! <!! close!]]
-            [clojure.string :as string]
-            [langohr.core      :as rmq]
-            [langohr.channel   :as lch]
-            [langohr.queue     :as lq]
-            [langohr.exchange  :as le]
-            [langohr.consumers :as lc]
-            [langohr.basic     :as lb]
-            [ticktok.utils :refer [pretty safe]]))
+   [compojure.core :refer :all]
+   [compojure.handler :as handler]
+   [compojure.route :refer :all]
+   [ring.middleware.json :as middleware]
+   [clojure.data.json :as json]
+   [org.httpkit.server :as http]
+   [clojure.core.async :as async :refer [chan put! <!! close!]]
+   [clojure.string :as string]
+   [langohr.core      :as rmq]
+   [langohr.channel   :as lch]
+   [langohr.queue     :as lq]
+   [langohr.exchange  :as le]
+   [langohr.consumers :as lc]
+   [langohr.basic     :as lb]
+   [ticktok.utils :refer [pretty safe]]))
 
 (defonce server (atom {:instance nil
                        :request nil

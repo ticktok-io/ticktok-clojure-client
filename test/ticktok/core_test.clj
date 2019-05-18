@@ -48,7 +48,7 @@
 (defn ticktok-scheduled-ticks-and-respond-with [clock]
   (stub-respond-with clock)
   (stub/schedule-ticks)
-    true)
+  true)
 
 (defn register-clock
   ([]
@@ -61,13 +61,15 @@
      true)))
 
 
-(facts :f "about ticktok"
+(facts "about ticktok"
+
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts :f "when ticktok failed to fetch clock"
+         (facts "when ticktok failed to fetch clock"
 
                 (facts "when ticktok server failed to respond"
+
                        (with-state-changes [(before :contents (ticktok-returned-bad-request))]
 
                          (fact "should fail if ticktok server returned bad request"
@@ -75,21 +77,22 @@
 
                          (fact "should ask from ticktok server clock"
                                (ticktok-incoming-request) => (contains {:name (:name clock-request)
-                                                                             :schedule (:schedule clock-request)})))))
+                                                                        :schedule (:schedule clock-request)})))))
 
          (facts  "when clock is successfully sent"
 
-                (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))
-                                     (after :facts (tk/ticktok :close))]
-                  (let [ch (chan 1)
-                        callback #(put! ch "got tick")
-                        clock-request (make-clock-request callback)
-                        invoked? #(let [m (<!! ch)]
-                                      (close! ch)
-                                      m)]
+                 (with-state-changes [(before :facts (ticktok-scheduled-ticks-and-respond-with clock))
+                                      (after :facts (tk/ticktok :close))]
 
-                    (fact "should invoke callback upon tick"
-                          (register-clock clock-request) => true
-                          (stub/send-tick) => true
-                          (invoked?) => truthy
-                          ))))))
+                   (let [ch (chan 1)
+                         callback #(put! ch "got tick")
+                         clock-request (make-clock-request callback)
+                         invoked? #(let [m (<!! ch)]
+                                     (close! ch)
+                                     m)]
+
+                     (fact "should invoke callback upon tick"
+                           (register-clock clock-request) => true
+                           (stub/send-tick) => true
+                           (invoked?) => truthy
+                           ))))))
