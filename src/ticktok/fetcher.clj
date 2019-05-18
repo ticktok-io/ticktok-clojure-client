@@ -22,14 +22,14 @@
   (let [options {:headers  {"Content-Type" "application/json"}
                  :query-params {:access_token token}
                  :body (json/write-str {:name name
-                                         :schedule schedule})}
-         endpoint (string/join [host api])
-         {:keys [status body error]} @(http/post endpoint
-                                                 options)]
+                                        :schedule schedule})}
+        endpoint (string/join [host api])
+        {:keys [status body error]} @(http/post endpoint
+                                                options)]
     (if (not= status 201)
-       (fail-with  "Failed to fetch clock" {:status status
-                                            :request clock-req})
-       body)))
+      (fail-with  "Failed to fetch clock" {:status status
+                                           :request clock-req})
+      body)))
 
 (defn fetch-clock
   ([config clock-req]

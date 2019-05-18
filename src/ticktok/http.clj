@@ -30,8 +30,8 @@
 (defn shutdown-pool []
   (when-let [pool (pool)]
     (swap! state update :pool #(do
-                               (at/stop-and-reset-pool! pool :strategy :kill)
-                               %))))
+                                 (at/stop-and-reset-pool! pool :strategy :kill)
+                                 %))))
 (defn stop! []
   (stop-tasks)
   (shutdown-pool))
