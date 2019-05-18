@@ -63,9 +63,9 @@ Behind the scenes, both ways are effectively the same.
 
 To stop listening for new ticks, call ticktok with `:close`.
 
-### Replace callback for given clock
+### Replace callback of a given clock
 
-It's now (1.0.6+) possible to swap callback for a registered clock. When calling `(ticktok :schedule)` with the same clock but with new callback, ticktok swaps the consuming callback for the given clock.
+It's now (1.0.6+) possible to swap callback for a registered clock. When calling `(ticktok :schedule)` with the same clock but with different callback, ticktok swaps the consuming callback:
 
 ```clojure
 
