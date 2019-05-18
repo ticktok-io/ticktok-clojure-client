@@ -13,7 +13,7 @@
   (tk/ticktok :schedule conf req)
   true)
 
-(facts :f "about clock validity"
+(facts "about clock validity"
 
        (tabular
         (fact "should fail for invalid clock request"

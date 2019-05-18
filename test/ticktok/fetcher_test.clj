@@ -48,25 +48,29 @@
   ([n]
    (fetch-clock config clock-request n)))
 
-(facts :f "about fetching a clock"
-       (with-state-changes [(before :contents (start-ticktok))
-                            (after :contents (stop-ticktok))]
+(facts  "about fetching a clock"
 
-         (facts  "when failed to fetch clock"
+        (with-state-changes [(before :contents (start-ticktok))
+                             (after :contents (stop-ticktok))]
 
-                (with-state-changes [(before :contents (ticktok-respond-with-invalid-clock))]
-                  (fact "should fail if ticktok server respond with invalid clock"
-                        (fetch)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock))))
+          (facts  "when failed to fetch clock"
 
-         (facts "when ticktok respond with valid clock"
+                  (with-state-changes [(before :contents (ticktok-respond-with-invalid-clock))]
 
-                (with-state-changes [(before :contents (ticktok-respond-with-clock))]
-                  (fact  "should return clock details"
+                    (fact "should fail if ticktok server respond with invalid clock"
+                          (fetch)) => (throws RuntimeException #"Failed to parse clock" #(contains? (ex-data %) :clock))))
+
+          (facts "when ticktok respond with valid clock"
+
+                 (with-state-changes [(before :contents (ticktok-respond-with-clock))]
+
+                   (fact  "should return clock details"
                           (fetch) => (contains {:channel (contains
                                                           {:details (contains {:queue string?
                                                                                :uri string?})})
                                                 :name (:name clock-request)})))
 
-                (with-state-changes [(before :contents (ticktok-finally-respond-with-clock attempts))]
-                  (fact "should return clock details after retry"
-                        (fetch attempts) => truthy)))))
+                 (with-state-changes [(before :contents (ticktok-finally-respond-with-clock attempts))]
+
+                   (fact "should return clock details after retry"
+                         (fetch attempts) => truthy)))))

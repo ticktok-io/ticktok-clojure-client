@@ -32,61 +32,63 @@
   (Thread/sleep 3000)
   true)
 
-
 (facts "about subscribing to queue"
 
        (facts "when successfully subscribed"
 
               (with-state-changes [(after :contents (stop!))]
 
-                                   (with-state-changes [(before :contents (do
-                                                                            (stub/start-rabbit!)
-                                                                            (create-queues "q1" "q2")))
-                                                        (after :contents (do
-                                                                           (delete-queues "q1" "q2")
-                                                                           (stub/stop-rabbit!)))]
+                (with-state-changes [(before :contents (do
+                                                         (stub/start-rabbit!)
+                                                         (create-queues "q1" "q2")))
+                                     (after :contents (do
+                                                        (delete-queues "q1" "q2")
+                                                        (stub/stop-rabbit!)))]
 
-                                     (fact "should close rabbit for all consumers"
-                                           (let [counter (atom 0)
-                                                 not-invoked? #(zero? @counter)
-                                                 callback #(swap! counter inc)]
+                  (fact "should close rabbit for all consumers"
 
-                                             (subscribe-queue rabbit-uri "q1" callback) => truthy
-                                             (subscribe-queue rabbit-uri "q2" callback) => truthy
-                                             (stop!) => nil
-                                             (stub/send-tick) => true
-                                             (wait-a-bit) => true
-                                             (not-invoked?) => true)))
+                        (let [counter (atom 0)
+                              not-invoked? #(zero? @counter)
+                              callback #(swap! counter inc)]
 
-                                   (with-state-changes [(before :contents (do
-                                                                            (stub/start-rabbit!)
-                                                                            (create-queues "q1")))
-                                                        (after :contents (do
-                                                                           (delete-queues "q1")
-                                                                           (stub/stop-rabbit!)))]
+                          (subscribe-queue rabbit-uri "q1" callback) => truthy
+                          (subscribe-queue rabbit-uri "q2" callback) => truthy
+                          (stop!) => nil
+                          (stub/send-tick) => true
+                          (wait-a-bit) => true
+                          (not-invoked?) => true)))
 
-                                     (fact "should replace callback for given clock"
-                                           (let [ch (chan 1)
-                                                 cb1 #(put! ch "cb1")
-                                                 cb2 #(put! ch "cb2")
-                                                 invoked? (fn [cb]
-                                                            (let [m (<!! ch)]
-                                                              (= m cb)))]
-                                             (subscribe-queue "id-1234" rabbit-uri "q1" cb1) => truthy
-                                             (stub/send-tick) => true
-                                             (invoked? "cb1") => true
-                                             (subscribe-queue "id-1234" rabbit-uri "q1" cb2) => truthy
-                                             (stub/send-tick) => true
-                                             (invoked? "cb2") => true
-                                             (stub/send-tick) => true
-                                             (invoked? "cb1") => false
-                                             )))))
+                (with-state-changes [(before :contents (do
+                                                         (stub/start-rabbit!)
+                                                         (create-queues "q1")))
+                                     (after :contents (do
+                                                        (delete-queues "q1")
+                                                        (stub/stop-rabbit!)))]
 
-              (facts "when failed to subscribe"
-                     (with-state-changes [(after :contents (stop!))]
+                  (fact "should replace callback for given clock"
 
-                       (fact "should fail for connection error"
-                             (subscribe-queue invalid-uri)) => (throws RuntimeException #"Failed to connect queue server")
+                        (let [ch (chan 1)
+                              cb1 #(put! ch "cb1")
+                              cb2 #(put! ch "cb2")
+                              invoked? (fn [cb]
+                                         (let [m (<!! ch)]
+                                           (= m cb)))]
+                          (subscribe-queue "id-1234" rabbit-uri "q1" cb1) => truthy
+                          (stub/send-tick) => true
+                          (invoked? "cb1") => true
+                          (subscribe-queue "id-1234" rabbit-uri "q1" cb2) => truthy
+                          (stub/send-tick) => true
+                          (invoked? "cb2") => true
+                          (stub/send-tick) => true
+                          (invoked? "cb1") => false
+                          )))))
 
-                       (fact "should fail if queue wasn't found"
-                             (subscribe-queue rabbit-uri "invalid.q")) => (throws RuntimeException #"Failed to subscribe queue"))))
+       (facts "when failed to subscribe"
+
+              (with-state-changes [(after :contents (stop!))]
+
+                (fact "should fail for connection error"
+                      (subscribe-queue invalid-uri)) => (throws RuntimeException #"Failed to connect queue server")
+
+                (fact "should fail if queue wasn't found"
+                      (subscribe-queue rabbit-uri "invalid.q")) => (throws RuntimeException #"Failed to subscribe queue"))))
