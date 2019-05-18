@@ -8,6 +8,11 @@
 
 (defonce rabbit (atom {:chan nil :conn nil}))
 
+(defonce state (atom {:clocks {}}))
+
+(defn- clocks []
+  (:clocks @state))
+
 (defn- rmq-chan []
   (:chan @rabbit))
 
@@ -32,7 +37,7 @@
       (swap! rabbit assoc :conn conn :chan ch)))
   nil)
 
-(defn stop! []
+(defn close-rabbit! []
   (let [[chan conn] (rmq-chan-conn)
         closer #(when (and (some? %) (rmq/open? %))
                   (rmq/close %))]
@@ -40,6 +45,11 @@
     (closer conn)
     (swap! rabbit assoc :conn nil :chan nil)
     nil))
+
+(defn stop! []
+  (close-rabbit!)
+  (swap! state assoc :clocks {})
+  nil)
 
 (defn- exception-handler [e details msg]
   (let [exp (Throwable->map e)
@@ -50,7 +60,7 @@
 (defn- wrap [callback]
   (fn [ch {:keys [content-type delivery-tag type] :as meta} ^bytes payload]
     (let [msg (String. payload "UTF-8")
-          r (callback)]
+          r (@callback)]
       r)))
 
 (defmacro try-or-fail [action req msg]
@@ -59,9 +69,22 @@
      (catch Exception e#
        (exception-handler e# ~req ~msg))))
 
-(defn- try-subscribe [qname callback]
+(defn swap-callback! [cb new-cb]
+  (reset! cb new-cb))
+
+(defn subscribe-callback! [id qname callback]
+  (let [callback-ref (atom callback)]
+    (lc/subscribe (rmq-chan) qname (wrap callback-ref) {:auto-ack true})
+    (swap! state update :clocks assoc id callback-ref)))
+
+(defn subscribe-queue [id qname callback]
+  (if-let [cb (get (clocks) id)]
+    (swap-callback! cb callback)
+    (subscribe-callback! id qname callback)))
+
+(defn- try-subscribe [id qname callback]
   (try-or-fail
-   (lc/subscribe (rmq-chan) qname (wrap callback) {:auto-ack true})
+   (subscribe-queue id qname callback)
    {:queue qname}
    "Failed to subscribe queue"))
 
@@ -71,6 +94,6 @@
    {:uri uri}
    "Failed to connect queue server"))
 
-(defn subscribe [uri qname callback]
+(defn subscribe [id uri qname callback]
   (try-connect uri)
-  (try-subscribe qname callback))
+  (try-subscribe id qname callback))

@@ -177,6 +177,7 @@
   server)
 
 (defn send-tick []
+  (println "stub ticktok sending tick")
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
   true)
 
