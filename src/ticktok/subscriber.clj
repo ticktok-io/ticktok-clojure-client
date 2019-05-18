@@ -19,7 +19,6 @@
 (defmulti clock-factory (fn [{:keys [channel id]} _]
                           (keyword (:type channel))))
 
-
 (defmethod clock-factory :rabbit [{:keys [channel id]} {:keys [callback]}]
   (let [details (:details channel)]
     (RabbitClock. id (:uri details) (:queue details) callback)))
