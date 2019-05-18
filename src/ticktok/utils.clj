@@ -30,7 +30,7 @@
                           :max-count (:max-count retry-defaults)
                           :initial-delay (:initial-delay retry-defaults)
                           :max-delay (:max-delay retry-defaults))}
-       (p/retriable {:catch [RuntimeException]}
-         ~f))
-    (catch Exception e#
-      (fail-with-inner-ex e#))))
+              (p/retriable {:catch [RuntimeException]}
+                           ~f))
+     (catch Exception e#
+       (fail-with-inner-ex e#))))
