@@ -73,6 +73,7 @@
                               invoked? (fn [cb]
                                          (let [m (<!! ch)]
                                            (= m cb)))]
+                          
                           (subscribe-queue "id-1234" rabbit-uri "q1" cb1) => truthy
                           (stub/send-tick) => true
                           (invoked? "cb1") => true
