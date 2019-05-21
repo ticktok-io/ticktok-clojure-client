@@ -10,7 +10,7 @@ Ticktok artifacts are [released to Clojars](https://clojars.org/ticktok).
 
 * [Leiningen](https://leiningen.org/):
 ```clojure
-[ticktok "1.0.6"]
+[ticktok "1.0.7"]
 ```
 
 * [Maven](http://maven.apache.org/):
@@ -18,13 +18,13 @@ Ticktok artifacts are [released to Clojars](https://clojars.org/ticktok).
 <dependency>
   <groupId>ticktok</groupId>
   <artifactId>ticktok</artifactId>
-  <version>1.0.6</version>
+  <version>1.0.7</version>
 </dependency>
 ```
 
 * [Gradle](https://gradle.org/):
 ```
-compile 'ticktok:ticktok:1.0.6'
+compile 'ticktok:ticktok:1.0.7'
 ```
 
 ## Quick Start
