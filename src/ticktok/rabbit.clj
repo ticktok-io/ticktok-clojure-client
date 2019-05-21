@@ -26,10 +26,6 @@
   (let [[chan conn] (rmq-chan-conn)]
     (every? nil? [chan conn])))
 
-(defn- running []
-  (let [[chan conn] (rmq-chan-conn)]
-    (every? some? [chan conn])))
-
 (defn start! [uri]
   (when (not-running)
     (let [conn  (rmq/connect {:uri uri})
@@ -37,7 +33,7 @@
       (swap! rabbit assoc :conn conn :chan ch)))
   nil)
 
-(defn close-rabbit! []
+(defn- close-rabbit! []
   (let [[chan conn] (rmq-chan-conn)
         closer #(when (and (some? %) (rmq/open? %))
                   (rmq/close %))]
@@ -72,12 +68,12 @@
 (defn swap-callback! [cb new-cb]
   (reset! cb new-cb))
 
-(defn subscribe-callback! [id qname callback]
+(defn- subscribe-callback! [id qname callback]
   (let [callback-ref (atom callback)]
     (lc/subscribe (rmq-chan) qname (wrap callback-ref) {:auto-ack true})
     (swap! state update :clocks assoc id callback-ref)))
 
-(defn subscribe-queue [id qname callback]
+(defn- subscribe-queue [id qname callback]
   (if-let [cb (get (clocks) id)]
     (swap-callback! cb callback)
     (subscribe-callback! id qname callback)))
