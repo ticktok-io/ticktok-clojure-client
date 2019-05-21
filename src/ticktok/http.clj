@@ -19,15 +19,15 @@
   (when (nil? (pool))
     (swap! state assoc :pool (at/mk-pool))))
 
-(defn stop-task [t]
+(defn- stop-task [t]
   (at/stop t))
 
-(defn stop-tasks []
+(defn- stop-tasks []
   (doseq [[c t] (tasks)]
     (stop-task (:task t)))
   (swap! state assoc :tasks {}))
 
-(defn shutdown-pool []
+(defn- shutdown-pool []
   (when-let [pool (pool)]
     (swap! state update :pool #(do
                                  (at/stop-and-reset-pool! pool :strategy :kill)

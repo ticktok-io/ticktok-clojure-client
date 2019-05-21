@@ -21,7 +21,6 @@
                                   [ring "1.7.1"]
                                   [org.clojure/core.async "0.4.490"]
                                   [ring/ring-json "0.4.0"]
-                                  [com.novemberain/langohr "5.0.0"]
                                   [midje "1.9.6"]]
                    :plugins [[lein-midje "3.2.1"]]}}
 
