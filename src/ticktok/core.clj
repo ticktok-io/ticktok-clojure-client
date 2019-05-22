@@ -35,7 +35,7 @@
      (subscriber/subscribe-clock clock parsed-request)
      (dispatch-fn parsed-config))))
 
-(defmethod ticktok :close [_]
+(defmethod ticktok :close [& _]
   (rabbit/stop!)
   (http/stop!)
   nil)
