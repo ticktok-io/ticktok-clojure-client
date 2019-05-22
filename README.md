@@ -50,7 +50,7 @@ Ticktok assumes default configuration when not provided, as documented in [Tickt
                               :schedule "every.1.hours"
                               :callback #(println "Second clock got a tick!")})
 
-(ticktok :close)
+(tk/ticktok :close)
 
 ```
 
