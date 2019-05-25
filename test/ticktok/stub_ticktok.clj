@@ -143,11 +143,24 @@
         (make-response [{:tick clock-id}] 200))
       (make-response nil 400))))
 
+(defn tick-clock-handler [clock-id]
+  (println "ticked for " clock-id)
+  (swap! server update :incoming-clocks conj clock-id)
+  (fn [req]
+    (if (contains? (:ticks @server) clock-id)
+      (do
+        (swap! server update :ticks disj clock-id)
+        (make-response nil 204))
+      (make-response nil 400))))
+
 (defroutes api-routes
   (context "/api/v1/clocks" []
-           (POST "/" [access_token] clock-handler))
+           (POST "/" [access_token] clock-handler)
+           (GET "/" [name schedule access_token] clock-handler))
   (GET "/:clock-id/pop" [clock-id]
-       (http-clock-handler clock-id)))
+       (http-clock-handler clock-id))
+  (PUT "/:clock-id/tick" [clock-id]
+       (tick-clock-handler clock-id)))
 
 (def app
   (-> (handler/site api-routes)
