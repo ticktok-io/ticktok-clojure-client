@@ -62,10 +62,10 @@
 
 (defn clock-is-registered [clock]
   (ticktok-respond-with clock)
-  (stub/push-tick (stub-ticktok) (:id clock)))
+  (stub/push-tick (stub-ticktok)))
 
-(defn ticked? [clock-id]
-  (stub/popped? (stub-ticktok) clock-id))
+(defn ticked? []
+  (stub/popped? (stub-ticktok)))
 
 (defn tick-on [clock-request]
   (tk/ticktok :tick config (select-keys clock-request [:name :schedule]))
@@ -112,5 +112,5 @@
 
                    (fact "should request tick for given clock"
                          (tick-on clock-request) => true
-                         (ticked? (:id clock)) => true
+                         (ticked?) => true
                          )))))

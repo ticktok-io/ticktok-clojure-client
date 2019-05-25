@@ -36,6 +36,8 @@
 
 (def host (format "http://localhost:%d" port))
 
+(def clock-id "my.id")
+
 (defn rmq-chan []
   (:chan @rabbit))
 
@@ -122,7 +124,7 @@
                          :type "rabbit"}
                :name name
                :schedule schedule
-               :id "my.id"
+               :id clock-id
                :url "my.url"}]
      (make-response body))))
 
@@ -145,6 +147,7 @@
 
 (defn tick-clock-handler [clock-id]
   (println "ticked for " clock-id)
+  (println "ticks " (:ticks @server))
   (swap! server update :incoming-clocks conj clock-id)
   (fn [req]
     (if (contains? (:ticks @server) clock-id)
@@ -156,11 +159,11 @@
 (defroutes api-routes
   (context "/api/v1/clocks" []
            (POST "/" [access_token] clock-handler)
-           (GET "/" [name schedule access_token] clock-handler))
+           (GET "/" [name schedule access_token] clock-handler)
+           (PUT "/:clock-id/tick" [clock-id]
+                (tick-clock-handler clock-id)))
   (GET "/:clock-id/pop" [clock-id]
-       (http-clock-handler clock-id))
-  (PUT "/:clock-id/tick" [clock-id]
-       (tick-clock-handler clock-id)))
+       (http-clock-handler clock-id)))
 
 (def app
   (-> (handler/site api-routes)
@@ -194,9 +197,12 @@
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
   true)
 
-(defn push-tick [server cl]
-  (swap! server update :ticks conj cl)
-  true)
+(defn push-tick
+  ([server]
+   (push-tick server clock-id))
+  ([server cl]
+   (swap! server update :ticks conj cl)
+   true))
 
 (defn bind-queue [qname]
   (let [ch (rmq-chan)]
@@ -217,8 +223,11 @@
         req (<!! c)]
     req))
 
-(defn popped? [server clock]
-  (contains? (:incoming-clocks @server) clock))
+(defn popped?
+  ([server]
+   (popped? server clock-id))
+  ([server clock]
+   (contains? (:incoming-clocks @server) clock)))
 
 (defn fail-for [server n]
   (swap! server assoc :retry n)
