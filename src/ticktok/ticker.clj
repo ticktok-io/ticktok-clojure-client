@@ -14,9 +14,11 @@
                                 :schedule schedule
                                 :access_token token}}
         {:keys [status body error]} @(http/get url
-                                                options)]
-    (println "ticktok repond with " status body)
-    (dom/parse-clock body)))
+                                               options)]
+    (if (not= status 201)
+      (fail-with "Failed to fetch clock" {:clock [name schedule]
+                                          :status status})
+      (dom/parse-clock body))))
 
 (defn tick-on [{:keys [host token]} clock-id]
   (let [url (string/join [host api "/" clock-id "/tick"])
@@ -27,6 +29,7 @@
       (fail-with "Failed to tick for clock" {:clock-id clock-id
                                              :status status})
       true)))
+
 
 (defn tick [config clock-request]
   (let [clock (fetch-clock config clock-request)]

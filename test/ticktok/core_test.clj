@@ -71,7 +71,7 @@
   (tk/ticktok :tick config (select-keys clock-request [:name :schedule]))
   true)
 
-(facts "about ticktok"
+(facts :f "about ticktok"
 
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
