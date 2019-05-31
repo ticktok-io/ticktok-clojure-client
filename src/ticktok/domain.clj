@@ -1,9 +1,8 @@
 (ns ticktok.domain
   (:require [clojure.string :as string]
             [clojure.spec.alpha :as s]
+            [clojure.data.json :as json]
             [ticktok.utils :refer [fail-with]]))
-
-
 
 (s/def ::schedule-type string?)
 
@@ -59,3 +58,10 @@
     (if (= ::s/invalid parsed)
       (fail-with "Invalid input" (s/explain-data type entity))
       parsed)))
+
+(defn parse-clock [raw]
+  (let [cl-map (json/read-str raw :key-fn keyword)
+        clock (conform ::clock cl-map)]
+    (if (= ::s/invalid clock)
+      (fail-with  "Failed to parse clock" {:clock raw})
+      clock)))
