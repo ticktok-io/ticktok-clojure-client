@@ -119,28 +119,19 @@
   ([clock-req]
    (make-clock-from clock-req 201))
   ([clock-req status]
-   (make-clock-from clock-req qname status))
-  ([{:keys [name schedule]} qname status]
-   (let [body {:channel {:details {:queue qname
-                                   :uri rabbit-uri}
-                         :type "rabbit"}
-               :name name
-               :schedule schedule
-               :id clock-id
-               :url "my.url"}]
+   (make-clock-from clock-req qname status identity))
+  ([{:keys [name schedule]} qname status body-builder]
+   (let [body (body-builder {:channel {:details {:queue qname
+                                                 :uri rabbit-uri}
+                                       :type "rabbit"}
+                             :name name
+                             :schedule schedule
+                             :id clock-id
+                             :url "my.url"})]
      (make-response body status))))
 
-(defn make-clocks-from [{:keys [name schedule]}]
-  (let [body [{:channel {:details {:queue qname
-                                   :uri rabbit-uri}
-                         :type "rabbit"}
-               :name name
-               :schedule schedule
-               :id clock-id
-               :url "my.url"}]
-        resp (make-response body 200)]
-    resp
-    ))
+(defn make-clocks-from [clock-req]
+  (make-clock-from clock-req qname 200 #(vector %)))
 
 (defn clock-handler [req]
   (if (should-repond?)
