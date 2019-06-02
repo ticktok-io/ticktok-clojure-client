@@ -24,6 +24,8 @@
 
 (s/def ::channel (s/keys :req-un [::details ::type]))
 
+(s/def ::status string?)
+
 (s/fdef ::callback
         :args any?
         :ret any?)
@@ -33,7 +35,8 @@
 
 (s/def ::url string?)
 
-(s/def ::clock (s/keys :req-un [::channel ::id ::name ::schedule ::url]))
+(s/def ::clock (s/keys :req-un [::id ::name ::schedule ::url]
+                       :op-un [::channel ::status]))
 
 (s/def ::host string?)
 
@@ -59,9 +62,17 @@
       (fail-with "Invalid input" (s/explain-data type entity))
       parsed)))
 
-(defn parse-clock [raw]
+(defn- parse [raw selector]
   (let [cl-map (json/read-str raw :key-fn keyword)
-        clock (conform ::clock cl-map)]
+        val (selector cl-map)
+        clock (conform ::clock val)]
     (if (= ::s/invalid clock)
-      (fail-with  "Failed to parse clock" {:clock raw})
+      (fail-with  "Failed to parse clock" {:clock raw
+                                           :reason (s/explain ::clock val)})
       clock)))
+
+(defn parse-clock [raw]
+  (parse raw identity))
+
+(defn parse-clocks [raw]
+  (parse raw #(get % 0)))

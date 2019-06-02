@@ -9,28 +9,26 @@
 
 (defn fetch-clock [{:keys [host token]} {:keys [name schedule]}]
   (let [url (string/join [host api])
-        options {:headers  {"Content-Type" "application/json"}
-                 :query-params {:name name
+        options {:query-params {:name name
                                 :schedule schedule
-                                :access_token token}}
+                                :access_token token}
+                 :as :text}
         {:keys [status body error]} @(http/get url
                                                options)]
-    (if (not= status 201)
+    (if (not= status 200)
       (fail-with "Failed to fetch clock" {:clock [name schedule]
                                           :status status})
-      (dom/parse-clock body))))
+      (dom/parse-clocks body))))
 
-(defn tick-on [{:keys [host token]} clock-id]
-  (let [url (string/join [host api "/" clock-id "/tick"])
+(defn tick-on [{:keys [host token]} {:keys [id] :as clock}]
+  (let [url (string/join [host api "/" id "/tick"])
         options {:query-params {:access_token token}}
-        {:keys [status body error]} @(http/put url
-                                               options)]
+        {:keys [status body error]} @(http/put url options)]
     (if (not= status 204)
-      (fail-with "Failed to tick for clock" {:clock-id clock-id
+      (fail-with "Failed to tick for clock" {:clock clock
                                              :status status})
       true)))
 
-
 (defn tick [config clock-request]
   (let [clock (fetch-clock config clock-request)]
-    (tick-on config (:id clock))))
+    (tick-on config clock)))

@@ -13,7 +13,7 @@
 
 (def clock-request {:name "my.clock" :schedule "every.5.seconds"})
 
-(def clock (stub/make-clock-from clock-request))
+(def clock (stub/make-clocks-from clock-request))
 
 (defn start-ticktok []
   (swap! state assoc :stub-ticktok (stub/start!)))
@@ -47,4 +47,4 @@
                 (with-state-changes [(before :contents (ticktok-respond-with-clock-but-failed-to-tick))]
 
                   (fact "should fail when failed to tick"
-                        (ticker/tick config clock-request)) => (throws RuntimeException #"Failed to tick for clock" #(contains? (ex-data %) :clock-id))))))
+                        (ticker/tick config clock-request)) => (throws RuntimeException #"Failed to tick for clock" #(contains? (ex-data %) :clock))))))

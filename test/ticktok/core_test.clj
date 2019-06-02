@@ -60,9 +60,10 @@
      (ticktok :schedule req)
      true)))
 
-(defn clock-is-registered [clock]
-  (ticktok-respond-with clock)
-  (stub/push-tick (stub-ticktok)))
+(defn clock-is-registered []
+  (let [clock-by-get (stub/make-clocks-from clock-request)]
+    (ticktok-respond-with clock-by-get)
+    (stub/push-tick (stub-ticktok))))
 
 (defn ticked? []
   (stub/popped? (stub-ticktok)))
@@ -107,7 +108,7 @@
                            (invoked?) => truthy
                            )))
 
-                 (with-state-changes [(before :facts (clock-is-registered clock))
+                 (with-state-changes [(before :facts (clock-is-registered))
                                       (after :facts (tk/ticktok :close))]
 
                    (fact "should request tick for given clock"
