@@ -1,4 +1,4 @@
-(defproject ticktok/ticktok "1.0.8-SNAPSHOT"
+(defproject ticktok/ticktok "1.0.8"
   :description "ticktok clojure client"
   :url "https://ticktok.io"
   :license {:name "Eclipse Public License"
