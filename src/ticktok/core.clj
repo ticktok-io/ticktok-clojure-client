@@ -7,7 +7,7 @@
             [ticktok.http :as http]
             [ticktok.utils :refer [fail-with pretty]]))
 
-(def default-config {:host "http://localhost:8080"
+(def default-config {:host "http://localhost:9643"
                      :token "ticktok-zY3wpR"})
 
 (declare ticktok)
