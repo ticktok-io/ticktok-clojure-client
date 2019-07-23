@@ -1,9 +1,8 @@
 (ns ticktok.domain
   (:require [clojure.string :as string]
             [clojure.spec.alpha :as s]
+            [clojure.data.json :as json]
             [ticktok.utils :refer [fail-with]]))
-
-
 
 (s/def ::schedule-type string?)
 
@@ -25,6 +24,8 @@
 
 (s/def ::channel (s/keys :req-un [::details ::type]))
 
+(s/def ::status string?)
+
 (s/fdef ::callback
         :args any?
         :ret any?)
@@ -34,7 +35,8 @@
 
 (s/def ::url string?)
 
-(s/def ::clock (s/keys :req-un [::channel ::id ::name ::schedule ::url]))
+(s/def ::clock (s/keys :req-un [::id ::name ::schedule ::url]
+                       :op-un [::channel ::status]))
 
 (s/def ::host string?)
 
@@ -59,3 +61,18 @@
     (if (= ::s/invalid parsed)
       (fail-with "Invalid input" (s/explain-data type entity))
       parsed)))
+
+(defn- parse [raw selector]
+  (let [cl-map (json/read-str raw :key-fn keyword)
+        val (selector cl-map)
+        clock (conform ::clock val)]
+    (if (= ::s/invalid clock)
+      (fail-with  "Failed to parse clock" {:clock raw
+                                           :reason (s/explain ::clock val)})
+      clock)))
+
+(defn parse-clock [raw]
+  (parse raw identity))
+
+(defn parse-clocks [raw]
+  (parse raw #(get % 0)))

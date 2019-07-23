@@ -2,21 +2,13 @@
   (:require [org.httpkit.client :as http]
             [clojure.data.json :as json]
             [clojure.string :as string]
-            [ticktok.domain :as dom]
-            [clojure.spec.alpha :as s]
             [ticktok.rabbit :as rabbit]
+            [ticktok.domain :as dom]
             [ticktok.utils :refer [fail-with retry]]))
 
 (def api "/api/v1/clocks")
 
 (def default-attempts 6)
-
-(defn- parse-clock [raw]
-  (let [cl-map (json/read-str raw :key-fn keyword)
-        clock (dom/conform ::dom/clock cl-map)]
-    (if (= ::s/invalid clock)
-      (fail-with  "Failed to parse clock" {:clock raw})
-      clock)))
 
 (defn- fetch [{:keys [host token]} {:keys [name schedule] :as clock-req}]
   (let [options {:headers  {"Content-Type" "application/json"}
@@ -36,5 +28,5 @@
    (fetch-clock config clock-req default-attempts))
   ([config clock-req attempts]
    (let [clock (retry (fetch config clock-req) attempts)
-         clock (parse-clock clock)]
+         clock (dom/parse-clock clock)]
      clock)))

@@ -36,6 +36,8 @@
 
 (def host (format "http://localhost:%d" port))
 
+(def clock-id "my.id")
+
 (defn rmq-chan []
   (:chan @rabbit))
 
@@ -115,16 +117,21 @@
 
 (defn make-clock-from
   ([clock-req]
-   (make-clock-from clock-req qname))
-  ([{:keys [name schedule]} qname]
-   (let [body {:channel {:details {:queue qname
-                                   :uri rabbit-uri}
-                         :type "rabbit"}
-               :name name
-               :schedule schedule
-               :id "my.id"
-               :url "my.url"}]
-     (make-response body))))
+   (make-clock-from clock-req 201))
+  ([clock-req status]
+   (make-clock-from clock-req qname status identity))
+  ([{:keys [name schedule]} qname status body-builder]
+   (let [body (body-builder {:channel {:details {:queue qname
+                                                 :uri rabbit-uri}
+                                       :type "rabbit"}
+                             :name name
+                             :schedule schedule
+                             :id clock-id
+                             :url "my.url"})]
+     (make-response body status))))
+
+(defn make-clocks-from [clock-req]
+  (make-clock-from clock-req qname 200 #(vector %)))
 
 (defn clock-handler [req]
   (if (should-repond?)
@@ -143,9 +150,23 @@
         (make-response [{:tick clock-id}] 200))
       (make-response nil 400))))
 
+(defn tick-clock-handler [clock-id]
+  (println "ticked for " clock-id)
+  (println "ticks " (:ticks @server))
+  (swap! server update :incoming-clocks conj clock-id)
+  (fn [req]
+    (if (contains? (:ticks @server) clock-id)
+      (do
+        (swap! server update :ticks disj clock-id)
+        (make-response nil 204))
+      (make-response nil 400))))
+
 (defroutes api-routes
   (context "/api/v1/clocks" []
-           (POST "/" [access_token] clock-handler))
+           (POST "/" [access_token] clock-handler)
+           (GET "/" [name schedule access_token] clock-handler)
+           (PUT "/:clock-id/tick" [clock-id]
+                (tick-clock-handler clock-id)))
   (GET "/:clock-id/pop" [clock-id]
        (http-clock-handler clock-id)))
 
@@ -181,9 +202,12 @@
   (lb/publish (rmq-chan) exchange-name "" "my.tick" {:content-type "text/plain"})
   true)
 
-(defn push-tick [server cl]
-  (swap! server update :ticks conj cl)
-  true)
+(defn push-tick
+  ([server]
+   (push-tick server clock-id))
+  ([server cl]
+   (swap! server update :ticks conj cl)
+   true))
 
 (defn bind-queue [qname]
   (let [ch (rmq-chan)]
@@ -204,8 +228,11 @@
         req (<!! c)]
     req))
 
-(defn popped? [server clock]
-  (contains? (:incoming-clocks @server) clock))
+(defn popped?
+  ([server]
+   (popped? server clock-id))
+  ([server clock]
+   (contains? (:incoming-clocks @server) clock)))
 
 (defn fail-for [server n]
   (swap! server assoc :retry n)

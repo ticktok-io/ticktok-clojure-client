@@ -38,7 +38,7 @@
       (stub/push-tick stub c)))
   true)
 
-(facts "about subscribing to clock on http mode"
+(facts :f "about subscribing to clock on http mode"
 
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
@@ -65,14 +65,14 @@
          (with-state-changes [(after :contents (http/stop!))]
 
            (fact "should replace callback for given clock"
-                 
+
                  (let [ch (chan 1)
                        cb1 #(put! ch "cb1")
                        cb2 #(put! ch "cb2")
                        invoked? (fn [cb]
                                   (let [m (<!! ch)]
                                     (= m cb)))]
-                   
+
                    (subscribe "c3" cb1) => true
                    (push-tick "c3") => true
                    (invoked? "cb1") => true

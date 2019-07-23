@@ -19,7 +19,7 @@
 (defn stub-ticktok []
   (get @state :stub-ticktok))
 
-(defn stub-respond-with [resp]
+(defn ticktok-respond-with [resp]
   (stub/respond-with (stub-ticktok) resp))
 
 (defn make-clock-request
@@ -42,11 +42,11 @@
 
 (defn ticktok-returned-bad-request []
   (println "stub-ticktok-returned-bad-request")
-  (stub-respond-with {:status 400})
+  (ticktok-respond-with {:status 400})
   true)
 
 (defn ticktok-scheduled-ticks-and-respond-with [clock]
-  (stub-respond-with clock)
+  (ticktok-respond-with clock)
   (stub/schedule-ticks)
   true)
 
@@ -60,13 +60,24 @@
      (ticktok :schedule req)
      true)))
 
+(defn clock-is-registered []
+  (let [clock-by-get (stub/make-clocks-from clock-request)]
+    (ticktok-respond-with clock-by-get)
+    (stub/push-tick (stub-ticktok))))
 
-(facts "about ticktok"
+(defn ticked? []
+  (stub/popped? (stub-ticktok)))
+
+(defn tick-on [clock-request]
+  (tk/ticktok :tick config (select-keys clock-request [:name :schedule]))
+  true)
+
+(facts :f "about ticktok"
 
        (with-state-changes [(before :contents (start-ticktok))
                             (after :contents (stop-ticktok))]
 
-         (facts "when ticktok failed to fetch clock"
+         (facts :f "when ticktok failed to fetch clock"
 
                 (facts "when ticktok server failed to respond"
 
@@ -91,8 +102,16 @@
                                      (close! ch)
                                      m)]
 
-                     (fact "should invoke callback upon tick"
+                     (fact :f "should invoke callback upon tick"
                            (register-clock clock-request) => true
                            (stub/send-tick) => true
                            (invoked?) => truthy
-                           ))))))
+                           )))
+
+                 (with-state-changes [(before :facts (clock-is-registered))
+                                      (after :facts (tk/ticktok :close))]
+
+                   (fact "should request tick for given clock"
+                         (tick-on clock-request) => true
+                         (ticked?) => true
+                         )))))

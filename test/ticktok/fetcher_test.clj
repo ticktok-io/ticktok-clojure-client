@@ -48,7 +48,7 @@
   ([n]
    (fetch-clock config clock-request n)))
 
-(facts  "about fetching a clock"
+(facts :f "about fetching a clock"
 
         (with-state-changes [(before :contents (start-ticktok))
                              (after :contents (stop-ticktok))]

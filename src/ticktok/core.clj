@@ -1,6 +1,7 @@
 (ns ticktok.core
   (:require [ticktok.domain :as dom]
             [ticktok.subscriber :as subscriber]
+            [ticktok.ticker :as ticker]
             [ticktok.fetcher :refer [fetch-clock]]
             [ticktok.rabbit :as rabbit]
             [ticktok.http :as http]
@@ -33,6 +34,15 @@
          parsed-request (dom/validate-input ::dom/clock-request clock-request)
          clock (fetch-clock parsed-config parsed-request)]
      (subscriber/subscribe-clock clock parsed-request)
+     (dispatch-fn parsed-config))))
+
+(defmethod ticktok :tick
+  ([_ clock-request]
+   (ticktok :tick default-config clock-request))
+  ([_ config clock-request]
+   (let [parsed-config (dom/validate-input ::dom/config config)
+         parsed-request (dom/validate-input ::dom/clock-request clock-request)]
+     (ticker/tick parsed-config parsed-request)
      (dispatch-fn parsed-config))))
 
 (defmethod ticktok :close [& _]
