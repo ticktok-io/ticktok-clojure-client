@@ -36,7 +36,7 @@
 (s/def ::url string?)
 
 (s/def ::clock (s/keys :req-un [::id ::name ::schedule ::url]
-                       :op-un [::channel ::status]))
+                       :op-un [::channel ::status ::links]))
 
 (s/def ::host string?)
 
