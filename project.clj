@@ -8,12 +8,7 @@
                  [org.clojure/data.json "0.2.6"]
                  [com.novemberain/langohr "5.0.0"]
                  [com.grammarly/perseverance "0.1.3"]
-                 [overtone/at-at "1.2.0"]]
-  :jvm-opts ~(let [version     (System/getProperty "java.version")
-                   [major _ _] (clojure.string/split version #"\.")]
-               (if (>= (java.lang.Integer/parseInt major) 9)
-                 ["--add-modules" "java.xml.bind"]
-                 []))
+                 [overtone/at-at "1.2.0"]]  
   :main ^:skip-aot ticktok.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}
