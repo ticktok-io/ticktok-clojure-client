@@ -33,9 +33,7 @@
 (s/def ::clock-request (s/keys :req-un [::name ::schedule]
                                :op-un [::callback]))
 
-(s/def ::url string?)
-
-(s/def ::clock (s/keys :req-un [::id ::name ::schedule ::url]
+(s/def ::clock (s/keys :req-un [::id ::name ::schedule]
                        :op-un [::channel ::status]))
 
 (s/def ::host string?)
@@ -72,6 +70,7 @@
       clock)))
 
 (defn parse-clock [raw]
+
   (parse raw identity))
 
 (defn parse-clocks [raw]
