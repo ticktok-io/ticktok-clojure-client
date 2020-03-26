@@ -1,5 +1,5 @@
 (ns ticktok.ticker
-  (:require [org.httpkit.client :as http]
+  (:require [clj-http.client :as http]
             [clojure.data.json :as json]
             [ticktok.domain :as dom]
             [clojure.string :as string]
@@ -13,7 +13,7 @@
                                 :schedule schedule
                                 :access_token token}
                  :as :text}
-        {:keys [status body error]} @(http/get url
+        {:keys [status body error]} (http/get url
                                                options)]
     (if (not= status 200)
       (fail-with "Failed to fetch clock" {:clock [name schedule]
@@ -23,7 +23,7 @@
 (defn tick-on [{:keys [host token]} {:keys [id] :as clock}]
   (let [url (string/join [host api "/" id "/tick"])
         options {:query-params {:access_token token}}
-        {:keys [status body error]} @(http/put url options)]
+        {:keys [status body error]} (http/put url options)]
     (if (not= status 204)
       (fail-with "Failed to tick for clock" {:clock clock
                                              :status status})

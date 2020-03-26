@@ -1,6 +1,6 @@
 (ns ticktok.fetcher
-  (:require [org.httpkit.client :as http]
-            [clojure.data.json :as json]
+  (:require [clojure.data.json :as json]
+            [clj-http.client :as http]
             [clojure.string :as string]
             [ticktok.rabbit :as rabbit]
             [ticktok.domain :as dom]
@@ -16,7 +16,7 @@
                  :body (json/write-str {:name name
                                         :schedule schedule})}
         endpoint (string/join [host api])
-        {:keys [status body error]} @(http/post endpoint
+        {:keys [status body error]} (http/post endpoint
                                                 options)]
     (if (not= status 201)
       (fail-with  "Failed to fetch clock" {:status status
