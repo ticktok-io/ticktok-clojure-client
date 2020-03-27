@@ -4,20 +4,21 @@
             [clojure.string :as string]
             [ticktok.rabbit :as rabbit]
             [ticktok.domain :as dom]
-            [ticktok.utils :refer [fail-with retry]]))
+            [ticktok.utils :refer [fail-with retry safe]]))
 
 (def api "/api/v1/clocks")
 
 (def default-attempts 6)
 
 (defn- fetch [{:keys [host token]} {:keys [name schedule] :as clock-req}]
-  (let [options {:headers  {"Content-Type" "application/json"}
-                 :query-params {:access_token token}
+  (let [options {:query-params {:access_token token}
                  :body (json/write-str {:name name
-                                        :schedule schedule})}
+                                        :schedule schedule})
+                 :content-type :json
+                 :accept :json
+                 :as :json}
         endpoint (string/join [host api])
-        {:keys [status body error]} (http/post endpoint
-                                                options)]
+        {:keys [status body]} (http/post endpoint options)]
     (if (not= status 201)
       (fail-with  "Failed to fetch clock" {:status status
                                            :request clock-req})

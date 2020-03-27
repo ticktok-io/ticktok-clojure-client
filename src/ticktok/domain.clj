@@ -61,8 +61,7 @@
       parsed)))
 
 (defn- parse [raw selector]
-  (let [cl-map (json/read-str raw :key-fn keyword)
-        val (selector cl-map)
+  (let [val (selector raw)
         clock (conform ::clock val)]
     (if (= ::s/invalid clock)
       (fail-with  "Failed to parse clock" {:clock raw

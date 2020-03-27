@@ -15,7 +15,8 @@
   `(try
      ~body
      (catch Exception e#
-       (str "caught exception: " (.getMessage e#)))))
+       (str "caught exception: " (Throwable->map e#)
+       (Throwable->map e#)))))
 
 (defmacro fail-with [msg details]
   `(throw (ex-info ~msg ~details)))
