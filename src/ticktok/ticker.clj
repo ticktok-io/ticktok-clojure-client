@@ -12,11 +12,11 @@
         options {:query-params {:name name
                                 :schedule schedule
                                 :access_token token}}
-        {:keys [status body error]} (safe (http/get url options))]
+        {:keys [status body]} (safe (http/get url options))]
     (if (not= status 200)
       (fail-with "Failed to fetch clock" {:clock [name schedule]
                                           :status status})
-      (dom/parse-clock body))))
+      (dom/parse-clocks body))))
 
 (defn tick-on [{:keys [host token]} {:keys [id] :as clock}]
   (let [url (string/join [host api "/" id "/tick"])

@@ -122,12 +122,12 @@
    (make-clock-from clock-req qname status identity))
   ([{:keys [name schedule]} qname status body-builder]
    (let [body (body-builder {:channel {:details {:queue qname
-                                                 :uri rabbit-uri}
+                                                 :uri rabbit-uri
+                                                 :url "my.url"}
                                        :type "rabbit"}
                              :name name
                              :schedule schedule
-                             :id clock-id
-                             :url "my.url"})]
+                             :id clock-id})]
      (make-response body status))))
 
 (defn make-clocks-from [clock-req]

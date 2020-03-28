@@ -61,15 +61,25 @@
       parsed)))
 
 (defn- parse [raw selector]
-  (let [val (selector raw)
+  (println "-------------")
+  (println raw)
+  (println "-------------")
+  (let [cl-map (json/read-str raw :key-fn keyword)
+        val (selector cl-map)
         clock (conform ::clock val)]
     (if (= ::s/invalid clock)
       (fail-with  "Failed to parse clock" {:clock raw
-                                           :reason (s/explain ::clock val)})
+                                           :reason (s/explain ::clock cl-map)})
       clock)))
 
 (defn parse-clock [raw]
+  (println "parsing")
+  (println raw)
+  (println "parsing")
   (parse raw identity))
 
 (defn parse-clocks [raw]
-  (parse raw #(get % 0)))
+;  (println "-------------")
+ ; (println raw)
+  ;(println "-------------")
+  (parse raw #(nth % 0)))

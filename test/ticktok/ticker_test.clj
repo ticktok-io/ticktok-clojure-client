@@ -48,3 +48,4 @@
 
                   (fact "should fail when failed to tick"
                         (ticker/tick config clock-request)) => (throws RuntimeException #"Failed to tick for clock" #(contains? (ex-data %) :clock))))))
+

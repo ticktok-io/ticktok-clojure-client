@@ -14,11 +14,9 @@
   (let [options {:query-params {:access_token token}
                  :body (json/write-str {:name name
                                         :schedule schedule})
-                 :content-type :json
-                 :accept :json
-                 :as :json}
+                 :content-type :json}
         endpoint (string/join [host api])
-        {:keys [status body]} (http/post endpoint options)]
+        {:keys [status body]} (safe (http/post endpoint options))]
     (if (not= status 201)
       (fail-with  "Failed to fetch clock" {:status status
                                            :request clock-req})
