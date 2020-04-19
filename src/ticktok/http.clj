@@ -1,6 +1,6 @@
 (ns ticktok.http
-  (:require [ticktok.utils :refer [fail-with pretty]]
-            [org.httpkit.client :as http]
+  (:require [ticktok.utils :refer [fail-with pretty safe]]
+            [clj-http.client :as client]
             [clojure.data.json :as json]
             [overtone.at-at :as at]))
 
@@ -37,10 +37,9 @@
   (shutdown-pool))
 
 (defn- ticks [clock-url]
-  (let [{:keys [status body error]} @(http/get clock-url {:as :text})
-        parse #(json/read-str % :key-fn keyword)]
+  (let [{:keys [status body]} (safe (client/get clock-url {:as :json}))]
     (if (= status 200)
-      (parse body)
+      body
       nil)))
 
 (defn- run-task [url callback]

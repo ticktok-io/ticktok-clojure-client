@@ -66,11 +66,11 @@
         clock (conform ::clock val)]
     (if (= ::s/invalid clock)
       (fail-with  "Failed to parse clock" {:clock raw
-                                           :reason (s/explain ::clock val)})
+                                           :reason (s/explain ::clock cl-map)})
       clock)))
 
 (defn parse-clock [raw]
   (parse raw identity))
 
 (defn parse-clocks [raw]
-  (parse raw #(get % 0)))
+  (parse raw #(nth % 0)))

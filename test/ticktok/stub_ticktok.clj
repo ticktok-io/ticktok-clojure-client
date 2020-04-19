@@ -122,12 +122,12 @@
    (make-clock-from clock-req qname status identity))
   ([{:keys [name schedule]} qname status body-builder]
    (let [body (body-builder {:channel {:details {:queue qname
-                                                 :uri rabbit-uri}
+                                                 :uri rabbit-uri
+                                                 :url "my.url"}
                                        :type "rabbit"}
                              :name name
                              :schedule schedule
-                             :id clock-id
-                             :url "my.url"})]
+                             :id clock-id})]
      (make-response body status))))
 
 (defn make-clocks-from [clock-req]
@@ -141,7 +141,7 @@
     {:status 404}))
 
 (defn http-clock-handler [clock-id]
-  (println "popped for " clock-id)
+  (println "popped for" clock-id)
   (swap! server update :incoming-clocks conj clock-id)
   (fn [req]
     (if (contains? (:ticks @server) clock-id)
@@ -151,8 +151,7 @@
       (make-response nil 400))))
 
 (defn tick-clock-handler [clock-id]
-  (println "ticked for " clock-id)
-  (println "ticks " (:ticks @server))
+  (println "stub ticked for" clock-id)
   (swap! server update :incoming-clocks conj clock-id)
   (fn [req]
     (if (contains? (:ticks @server) clock-id)
@@ -168,6 +167,7 @@
            (PUT "/:clock-id/tick" [clock-id]
                 (tick-clock-handler clock-id)))
   (GET "/:clock-id/pop" [clock-id]
+       (println "stub ticktok popped for" clock-id)
        (http-clock-handler clock-id)))
 
 (def app
@@ -244,3 +244,4 @@
     (bind-queue qname)
     (println "ticks are scheduled")
     nil))
+

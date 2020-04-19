@@ -1,10 +1,10 @@
-(defproject ticktok/ticktok "1.0.10-SNAPSHOT"
+(defproject ticktok/ticktok "1.0.11-SNAPSHOT"
   :description "ticktok clojure client"
   :url "https://ticktok.io"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.0"]
-                 [http-kit "2.3.0"]
+                 [clj-http "3.10.0"]
                  [org.clojure/data.json "0.2.6"]
                  [com.novemberain/langohr "5.0.0"]
                  [com.grammarly/perseverance "0.1.3"]
@@ -16,7 +16,8 @@
                                   [ring "1.7.1"]
                                   [org.clojure/core.async "0.4.490"]
                                   [ring/ring-json "0.4.0"]
-                                  [midje "1.9.6"]]
+                                  [midje "1.9.6"]
+                                  [http-kit "2.3.0"]]
                    :plugins [[lein-midje "3.2.1"]]}}
 
   :release-tasks [["vcs" "assert-committed"]

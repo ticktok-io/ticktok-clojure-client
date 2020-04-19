@@ -1,4 +1,4 @@
-(ns ticktok.core-test
+ (ns ticktok.core-test
   (:require [clojure.test :refer :all]
             [ticktok.core :as tk]
             [ticktok.stub-ticktok :as stub]
@@ -84,7 +84,7 @@
                        (with-state-changes [(before :contents (ticktok-returned-bad-request))]
 
                          (fact "should fail if ticktok server returned bad request"
-                               (register-clock)) => (throws RuntimeException #"Failed to fetch clock" #(= (:status (ex-data %)) 400))
+                               (register-clock)) => (throws RuntimeException #"Failed to fetch clock")
 
                          (fact "should ask from ticktok server clock"
                                (ticktok-incoming-request) => (contains {:name (:name clock-request)
