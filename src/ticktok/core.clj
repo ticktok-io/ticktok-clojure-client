@@ -12,6 +12,14 @@
 
 (declare ticktok)
 
+(defn parse-input
+  ([config]
+   (dom/validate-input ::dom/config config)
+   ([config clock-request]
+    (let [parsed-config (parse-input config)
+          parsed-request (dom/validate-input ::dom/clock-request clock-request)]
+      [parsed-config, parsed-request]))))
+
 (defn- dispatch-fn [config]
   (fn [command & args]
     (ticktok command config (first args))))
@@ -23,15 +31,14 @@
   ([_]
    (ticktok :start default-config))
   ([_ config]
-   (let [parsed-config (dom/validate-input ::dom/config config)]
+   (let [parsed-config (parse-input config)]
      (dispatch-fn parsed-config))))
 
 (defmethod ticktok :schedule
   ([_ clock-request]
    (ticktok :schedule default-config clock-request))
   ([_ config clock-request]
-   (let [parsed-config (dom/validate-input ::dom/config config)
-         parsed-request (dom/validate-input ::dom/clock-request clock-request)
+   (let [[parsed-config, parsed-request] (parse-input config clock-request)
          clock (fetch-clock parsed-config parsed-request)]
      (subscriber/subscribe-clock clock parsed-request)
      (dispatch-fn parsed-config))))
@@ -40,8 +47,7 @@
   ([_ clock-request]
    (ticktok :tick default-config clock-request))
   ([_ config clock-request]
-   (let [parsed-config (dom/validate-input ::dom/config config)
-         parsed-request (dom/validate-input ::dom/clock-request clock-request)]
+   (let [[parsed-config, parsed-request] (parse-input config clock-request)]
      (ticker/tick parsed-config parsed-request)
      (dispatch-fn parsed-config))))
 
