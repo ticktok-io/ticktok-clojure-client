@@ -14,11 +14,11 @@
 
 (defn parse-input
   ([config]
-   (dom/validate-input ::dom/config config)
-   ([config clock-request]
-    (let [parsed-config (parse-input config)
-          parsed-request (dom/validate-input ::dom/clock-request clock-request)]
-      [parsed-config, parsed-request]))))
+   (dom/validate-input ::dom/config config))
+  ([config clock-request]
+   (let [parsed-config (parse-input config)
+         parsed-request (dom/validate-input ::dom/clock-request clock-request)]
+      [parsed-config, parsed-request])))
 
 (defn- dispatch-fn [config]
   (fn [command & args]
