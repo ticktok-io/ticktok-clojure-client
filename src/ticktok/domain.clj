@@ -60,17 +60,19 @@
       (fail-with "Invalid input" (s/explain-data type entity))
       parsed)))
 
-(defn- parse [raw selector]
-  (let [cl-map (json/read-str raw :key-fn keyword)
-        val (selector cl-map)
-        clock (conform ::clock val)]
-    (if (= ::s/invalid clock)
-      (fail-with  "Failed to parse clock" {:clock raw
+(defn- parse
+  ([raw] (parse raw identity))
+  ([raw selector]
+   (let [cl-map (json/read-str raw :key-fn keyword)
+         val    (selector cl-map)
+         clock  (conform ::clock val)]
+     (if (= ::s/invalid clock)
+       (fail-with "Failed to parse clock" {:clock  raw
                                            :reason (s/explain ::clock val)})
-      clock)))
+       clock))))
 
 (defn parse-clock [raw]
-  (parse raw identity))
+  (parse raw))
 
 (defn parse-clocks [raw]
   (parse raw #(get % 0)))

@@ -1,6 +1,6 @@
 (ns ticktok.subscribe-http-test
   (:require [clojure.test :refer :all]
-            [ticktok.http :as http]
+            [ticktok.transport.http :as http]
             [ticktok.stub-ticktok :as stub]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
             [midje.sweet :refer :all]))

@@ -1,4 +1,4 @@
-(ns ticktok.rabbit
+(ns ticktok.transport.rabbit
   (:require [langohr.core      :as rmq]
             [langohr.channel   :as lch]
             [langohr.queue     :as lq]
