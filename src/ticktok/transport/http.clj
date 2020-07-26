@@ -22,7 +22,7 @@
   (at/stop t))
 
 (defn- stop-tasks []
-  (doseq [[_ t] (tasks)]
+  (doseq [t (tasks)]
     (stop-task (:task t)))
   (swap! state assoc :tasks {}))
 
