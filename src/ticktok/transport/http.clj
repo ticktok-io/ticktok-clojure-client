@@ -1,6 +1,5 @@
 (ns ticktok.transport.http
-  (:require [ticktok.utils :refer [fail-with pretty]]
-            [org.httpkit.client :as http]
+  (:require [org.httpkit.client :as http]
             [clojure.data.json :as json]
             [overtone.at-at :as at]))
 
@@ -23,7 +22,7 @@
   (at/stop t))
 
 (defn- stop-tasks []
-  (doseq [[c t] (tasks)]
+  (doseq [t (tasks)]
     (stop-task (:task t)))
   (swap! state assoc :tasks {}))
 

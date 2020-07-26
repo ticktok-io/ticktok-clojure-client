@@ -1,4 +1,4 @@
-(ns ticktok.subscribe-test
+(ns ticktok.transport.rabbit-test
   (:require [clojure.test :refer :all]
             [ticktok.transport.rabbit :refer [subscribe stop! start!]]
             [ticktok.stub-ticktok :as stub]

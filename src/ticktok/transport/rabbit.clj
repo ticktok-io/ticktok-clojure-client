@@ -1,10 +1,8 @@
 (ns ticktok.transport.rabbit
   (:require [langohr.core      :as rmq]
             [langohr.channel   :as lch]
-            [langohr.queue     :as lq]
             [langohr.consumers :as lc]
-            [langohr.basic     :as lb]
-            [ticktok.utils :refer [fail-with pretty]]))
+            [ticktok.utils :refer [fail-with]]))
 
 (defonce rabbit (atom {:chan nil :conn nil}))
 
