@@ -21,9 +21,11 @@
   `(throw (ex-info ~msg ~details)))
 
 (defmacro fail-with-inner-ex [e]
-  `(let [src-ex# (:e (ex-data ~e))
-         src-ex# (Throwable->map src-ex#)
-         src-ex# (first (:via src-ex#)) ]
+  `(let [src-ex# (->> (ex-data ~e)
+                      :e
+                      Throwable->map
+                      :via
+                      first)]
      (fail-with (:message src-ex#) (:data src-ex#))))
 
 (defmacro retry [f attempts]
@@ -32,7 +34,7 @@
                           :max-count (:max-count retry-defaults)
                           :initial-delay (:initial-delay retry-defaults)
                           :max-delay (:max-delay retry-defaults))}
-              (p/retriable {:catch [RuntimeException]}
-                           ~f))
+       (p/retriable {:catch [RuntimeException]}
+         ~f))
      (catch Exception e#
        (fail-with-inner-ex e#))))
