@@ -1,4 +1,4 @@
-(ns ticktok.logic.subscriber
+(ns ticktok.subscriber
   (:require [ticktok.transport.rabbit :as rabbit]
             [ticktok.transport.http :as http]))
 

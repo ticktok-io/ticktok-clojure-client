@@ -1,6 +1,6 @@
 (ns ticktok.core
   (:require [ticktok.domain :as dom]
-            [ticktok.logic.subscriber :as subscriber]
+            [ticktok.subscriber :as subscriber]
             [ticktok.logic.ticker :as ticker]
             [ticktok.logic.fetcher :refer [fetch-clock]]
             [ticktok.transport.rabbit :as rabbit]
