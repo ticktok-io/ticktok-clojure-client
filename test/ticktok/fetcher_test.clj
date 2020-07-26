@@ -1,6 +1,6 @@
-(ns ticktok.fetcher-test
+(ns ticktok.logic.fetcher-test
   (:require [clojure.test :refer :all]
-            [ticktok.fetcher :refer [fetch-clock]]
+            [ticktok.logic.fetcher :refer [fetch-clock]]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [ticktok.domain :as dom]))

@@ -1,6 +1,6 @@
 (ns ticktok.subscribe-test
   (:require [clojure.test :refer :all]
-            [ticktok.rabbit :refer [subscribe stop! start!]]
+            [ticktok.transport.rabbit :refer [subscribe stop! start!]]
             [ticktok.stub-ticktok :as stub]
             [clojure.core.async :as async :refer [chan put! <!! close!]]
             [midje.sweet :refer :all]))

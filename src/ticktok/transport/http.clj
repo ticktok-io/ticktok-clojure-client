@@ -1,4 +1,4 @@
-(ns ticktok.http
+(ns ticktok.transport.http
   (:require [ticktok.utils :refer [fail-with pretty]]
             [org.httpkit.client :as http]
             [clojure.data.json :as json]
@@ -37,7 +37,7 @@
   (shutdown-pool))
 
 (defn- ticks [clock-url]
-  (let [{:keys [status body error]} @(http/get clock-url {:as :text})
+  (let [{:keys [status body _error]} @(http/get clock-url {:as :text})
         parse #(json/read-str % :key-fn keyword)]
     (if (= status 200)
       (parse body)
