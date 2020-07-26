@@ -1,4 +1,4 @@
-(ns ticktok.subscribe-http-test
+(ns ticktok.transport.subscribe-http-test
   (:require [clojure.test :refer :all]
             [ticktok.transport.http :as http]
             [ticktok.stub-ticktok :as stub]
