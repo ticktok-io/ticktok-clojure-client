@@ -3,8 +3,7 @@
             [ticktok.core :as tk]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
-            [clojure.core.async :as async :refer [chan put! <!! close!]]
-            [ticktok.domain :as dom]))
+            [clojure.core.async :as async :refer [chan put! <!! close!]]))
 
 (def host  "http://localhost:8080")
 

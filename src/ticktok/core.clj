@@ -5,7 +5,7 @@
             [ticktok.logic.fetcher :refer [fetch-clock]]
             [ticktok.transport.rabbit :as rabbit]
             [ticktok.transport.http :as http]
-            [ticktok.utils :refer [fail-with pretty]]))
+            [ticktok.utils :refer [fail-with]]))
 
 (def default-config {:host "http://localhost:9643"
                      :token "ticktok-zY3wpR"})

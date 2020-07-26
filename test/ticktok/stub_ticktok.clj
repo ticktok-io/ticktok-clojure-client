@@ -7,14 +7,12 @@
    [clojure.data.json :as json]
    [org.httpkit.server :as http]
    [clojure.core.async :as async :refer [chan put! <!! close!]]
-   [clojure.string :as string]
    [langohr.core      :as rmq]
    [langohr.channel   :as lch]
    [langohr.queue     :as lq]
    [langohr.exchange  :as le]
-   [langohr.consumers :as lc]
    [langohr.basic     :as lb]
-   [ticktok.utils :refer [pretty safe]]))
+   [ticktok.utils :refer [safe]]))
 
 (defonce server (atom {:instance nil
                        :request nil
@@ -90,13 +88,10 @@
 
 (defn stop-rabbit! []
   (when (running)
-    (let [[chan conn] (rmq-chan-conn)
-          closer #(when (rmq/open? %)
-                    (rmq/close %))]
-      (clear-resources!)
+     (clear-resources!)
       (close-rabbit!)
       (swap! rabbit assoc :conn nil :chan nil)
-      (println "rabbit stub stopped")))
+      (println "rabbit stub stopped"))
   true)
 
 (defn should-repond? []
@@ -143,7 +138,7 @@
 (defn http-clock-handler [clock-id]
   (println "popped for " clock-id)
   (swap! server update :incoming-clocks conj clock-id)
-  (fn [req]
+  (fn [_]
     (if (contains? (:ticks @server) clock-id)
       (do
         (swap! server update :ticks disj clock-id)
@@ -154,7 +149,7 @@
   (println "ticked for " clock-id)
   (println "ticks " (:ticks @server))
   (swap! server update :incoming-clocks conj clock-id)
-  (fn [req]
+  (fn [_]
     (if (contains? (:ticks @server) clock-id)
       (do
         (swap! server update :ticks disj clock-id)
@@ -239,8 +234,6 @@
   nil)
 
 (defn schedule-ticks []
-  (do
-    (start-rabbit!)
-    (bind-queue qname)
-    (println "ticks are scheduled")
-    nil))
+  (start-rabbit!)
+  (bind-queue qname)
+  (println "ticks are scheduled"))
