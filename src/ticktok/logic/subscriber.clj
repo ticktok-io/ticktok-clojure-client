@@ -1,7 +1,6 @@
-(ns ticktok.subscriber
-  (:require [ticktok.rabbit :as rabbit]
-            [ticktok.http :as http]
-            [ticktok.domain :as dom]))
+(ns ticktok.logic.subscriber
+  (:require [ticktok.transport.rabbit :as rabbit]
+            [ticktok.transport.http :as http]))
 
 (defprotocol Subscribble
   (subscribe [clock]))
@@ -16,7 +15,7 @@
   (subscribe [clock]
     (rabbit/subscribe (.id clock) (.uri clock) (.queue clock) (.callback clock))))
 
-(defmulti clock-factory (fn [{:keys [channel id]} _]
+(defmulti clock-factory (fn [{:keys [channel]} _]
                           (keyword (:type channel))))
 
 (defmethod clock-factory :rabbit [{:keys [channel id]} {:keys [callback]}]

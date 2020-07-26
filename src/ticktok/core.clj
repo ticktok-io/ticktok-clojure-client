@@ -1,10 +1,10 @@
 (ns ticktok.core
   (:require [ticktok.domain :as dom]
-            [ticktok.subscriber :as subscriber]
-            [ticktok.ticker :as ticker]
-            [ticktok.fetcher :refer [fetch-clock]]
-            [ticktok.rabbit :as rabbit]
-            [ticktok.http :as http]
+            [ticktok.logic.subscriber :as subscriber]
+            [ticktok.logic.ticker :as ticker]
+            [ticktok.logic.fetcher :refer [fetch-clock]]
+            [ticktok.transport.rabbit :as rabbit]
+            [ticktok.transport.http :as http]
             [ticktok.utils :refer [fail-with pretty]]))
 
 (def default-config {:host "http://localhost:9643"

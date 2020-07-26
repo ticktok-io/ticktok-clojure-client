@@ -1,6 +1,6 @@
-(ns ticktok.ticker-test
+(ns ticktok.logic.ticker-test
   (:require [clojure.test :refer :all]
-            [ticktok.ticker :as ticker]
+            [ticktok.logic.ticker :as ticker]
             [ticktok.stub-ticktok :as stub]
             [midje.sweet :refer :all]
             [ticktok.domain :as dom]))
